@@ -1,11 +1,11 @@
 # Juno
 
-
 ---
->  juno是一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具。
 
+> juno 是一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具。
 
 ## 特点
+
 1. 灵活：仅仅搭建了项目框架，每个部分都可以用类似组件替代，组件升级不依赖于框架升级；
 1. 简单：不过度设计，代码平实简单；
 1. 通用：通用业务开发所需要的功能；
@@ -16,37 +16,33 @@
 1. 容错性：为失败设计，大量引入对 SRE 的理解，鲁棒性高；
 1. 工具链：包含大量工具链，比如代码生成，lint 工具等等；
 
-
 ## 创建项目
 
 ### 版本需求
+
 需要使用 go v1.16 以上版本；
 
-
 ### 环境准备
+
 需要安装好对应的依赖环境，以及工具：
 
-- [go](https://golang.org/dl/) 
+- [go](https://golang.org/dl/)
 - [protoc](https://github.com/protocolbuffers/protobuf)
 - [protoc-gen-go](https://github.com/protocolbuffers/protobuf-go)
 
-开启GO111MODULE
+开启 GO111MODULE
 go env -w GO111MODULE=on
-
 
 ### 安装
 
-
 ```
 
-curl -L -o juno-cli https://
+curl -L -o juno-cli https://github.com/go-juno/juno/releases/download/v1.0.11/juno-cli
 chmod +x juno-cli && mv juno-cli /usr/local/bin/
 
 ```
 
 ### 创建项目
-
-
 
 ```
 # 创建项目模板
@@ -73,17 +69,15 @@ juno-cli grpc hello
 
 ![项目](http://ihs.joker.org.cn/img/20210705115702.png)
 
-
-
 ### 目录结构如下
 
 ```
-├── Dockerfile                      
+├── Dockerfile
 ├── LICENSE
 ├── README.md
 ├── api  --- 为外部提供的服务（http,grpc）
 │   ├── grpc ---grpc服务
-│   │   ├── grpc.go  ---提供grpc实例  
+│   │   ├── grpc.go  ---提供grpc实例
 │   │   ├── protos ---proto 文件以及生成的代码
 │   │   │   ├── greeting.pb.go
 │   │   │   ├── greeting.proto
@@ -93,12 +87,12 @@ juno-cli grpc hello
 │   │       ├── greeting_test.go
 │   │       └── service.go
 │   └── http ---http服务
-│       ├── handle  ---提供具体的http handle  
+│       ├── handle  ---提供具体的http handle
 │       │   └── greeting.go
 │       ├── http.go  ---提供http实例
 │       ├── middleware  ---http中间件
 │       │   └── middleware.go
-│       ├── schema  ---http请求校验以及转化为endpoint的入参 
+│       ├── schema  ---http请求校验以及转化为endpoint的入参
 │       │   └── greeting.go
 │       └── serialize ---endpoint的出参转化为http的response
 │           ├── base.go
@@ -109,7 +103,7 @@ juno-cli grpc hello
 │   └── wire_gen.go
 ├── configs  --- 配置文件
 │   └── config.yaml
-├── generate.go 
+├── generate.go
 ├── go.mod
 ├── go.sum
 ├── init
@@ -132,7 +126,7 @@ juno-cli grpc hello
 │       └── service.go
 ├── main.go ---项目启动
 └── pkg  ---公用包
-    ├── model ---基础数据模型 
+    ├── model ---基础数据模型
     │   └── model.go
     ├── res ---http返回类型
     │   └── response.go
@@ -140,9 +134,7 @@ juno-cli grpc hello
         └── util.go
 ```
 
-
 ### 启动项目
-
 
 ```
 
@@ -151,30 +143,29 @@ go run main.go
 
 ```
 
-
 ### awesome 工具
 
 #### air 代码热更新
+
 代码变更，自动热更新重启。推荐使用 [github.com/cosmtrek/air]([https://github.com/cosmtrek/air])
 `.air.conf`文件是一份默认配置，若已安装 air ，直接在路径下运行 `air` 即可
 
+#### golangci-lint 代码静态检查
 
-
-####  golangci-lint 代码静态检查
 ```
   // brew
   brew install golangci-lint
 ```
 
-####  pre-commit  git commit hook
+#### pre-commit git commit hook
 
 ```
   // brew
     brew install pre-commit
   // python
   pip3 install pre-commit
-  
+
   // install
    pre-commit install
-  
+
 ```
