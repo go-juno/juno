@@ -37,8 +37,8 @@ go env -w GO111MODULE=on
 
 ```
 
-curl -L -o juno-cli https://github.com/go-juno/juno/releases/download/v1.0.13/juno-cli
-chmod +x juno-cli && mv juno-cli /usr/local/bin/
+curl -L -o juno https://github.com/go-juno/juno/releases/download/v1.0.15/juno-cli
+chmod +x juno && mv juno-cli /usr/local/bin/
 
 ```
 
