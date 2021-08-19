@@ -37,7 +37,7 @@ go env -w GO111MODULE=on
 
 ```
 
-curl -L -o juno https://github.com/go-juno/juno/releases/download/v1.0.19/juno-cli
+curl -L -o juno https://github.com/go-juno/juno/releases/download/v1.0.20/juno
 chmod +x juno && mv juno /usr/local/bin/
 
 ```
@@ -46,22 +46,22 @@ chmod +x juno && mv juno /usr/local/bin/
 
 ```
 # 创建项目模板
-juno-cli new helloworld
+juno new helloworld
 cd helloworld
 # 拉取项目依赖
 go mod download
 
 # 生成service模板
-juno-cli service hello
+juno service hello
 
 # 生成endpoint模板
-juno-cli endpoint hello
+juno endpoint hello
 
 # 生成http模板
-juno-cli http hello
+juno http hello
 
 # 生成grpc模板
-juno-cli grpc hello
+juno grpc hello
 
 ```
 
