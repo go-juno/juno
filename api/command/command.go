@@ -6,6 +6,6 @@ import (
 )
 
 func GenCommandList(endpoint *endpoint.Endpoints) (cmdList []*cli.Command) {
-	cmdList = append(cmdList, NewNewCommand(endpoint))
+	cmdList = append(cmdList, NewCreateProjectCommand(endpoint))
 	return
 }

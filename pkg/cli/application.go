@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-juno/juno/api/cli/argv"
-	"github.com/go-juno/juno/api/cli/flag"
+	"github.com/go-juno/juno/pkg/cli/argv"
+	"github.com/go-juno/juno/pkg/cli/flag"
 )
 
 var (

@@ -5,17 +5,17 @@ import (
 	"github.com/go-juno/juno/pkg/cli"
 )
 
-type NewCommand struct {
+type CreateProjectCommand struct {
 	endpoint *endpoint.Endpoints
 }
 
-func (t *NewCommand) Main() {}
+func (t *CreateProjectCommand) Main() {}
 
-func NewNewCommand(endpoint *endpoint.Endpoints) *cli.Command {
+func NewCreateProjectCommand(endpoint *endpoint.Endpoints) *cli.Command {
 	return &cli.Command{
 		Name:  "new",
 		Short: "\tCreate a project\n",
-		RunI: &NewCommand{
+		RunI: &CreateProjectCommand{
 			endpoint: endpoint,
 		},
 	}

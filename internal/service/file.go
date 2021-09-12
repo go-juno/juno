@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/xerrors"
-	"gorm.io/gorm"
 )
 
 type FileService interface {
@@ -95,6 +94,6 @@ func (s *fileService) WriteToFile(fileName string, content string) (err error) {
 	return
 }
 
-func NewFileService(db *gorm.DB) FileService {
+func NewFileService() FileService {
 	return &fileService{}
 }

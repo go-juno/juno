@@ -3,12 +3,17 @@ package cmd
 import (
 	"log"
 
-	"github.com/go-juno/juno/commands"
+	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/cli"
 )
 
 func Start() {
 	log.SetFlags(log.Llongfile | log.LstdFlags)
-	cli.SetName("juno").SetVersion("v1.0.22")
-	cli.AddCommand(commands.Cmds...).Run()
+	commands, err := InitServer()
+	if err != nil {
+		panic(err)
+	}
+
+	cli.SetName("juno").SetVersion(constant.Version)
+	cli.AddCommand(commands...).Run()
 }

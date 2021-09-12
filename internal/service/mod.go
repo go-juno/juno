@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"golang.org/x/xerrors"
-	"gorm.io/gorm"
 )
 
 type ModService interface {
@@ -36,6 +35,6 @@ func (s *modService) GetMod() (mod string, err error) {
 	return
 }
 
-func NewModService(db *gorm.DB) ModService {
+func NewModService() ModService {
 	return &modService{}
 }

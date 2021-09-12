@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/go-juno/juno/api/cli/argv"
+	"github.com/go-juno/juno/pkg/cli/argv"
 )
 
 // 初始化

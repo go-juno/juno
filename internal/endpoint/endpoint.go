@@ -8,17 +8,15 @@ import (
 type Endpoints struct {
 	file service.FileService
 	mod  service.ModService
-	new  service.NewService
 }
 
 func NewEndpoints(
 	file service.FileService,
 	mod service.ModService,
-	new service.NewService) *Endpoints {
+) *Endpoints {
 	return &Endpoints{
 		file: file,
 		mod:  mod,
-		new:  new,
 	}
 }
 
