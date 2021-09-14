@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"juno/api/grpc/protos"
-	"juno/internal/endpoint"
+	"github.com/go-juno/juno/example/juno/api/grpc/protos"
+	"github.com/go-juno/juno/example/juno/internal/endpoint"
 )
 
 type GreetingServer struct {

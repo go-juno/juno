@@ -1,4 +1,4 @@
-# juno
+# github.com/go-juno/juno/example/juno
 
 ## Table of Contents
 

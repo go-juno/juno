@@ -3,7 +3,7 @@ package config
 import (
 	"log"
 
-	"juno/init/flag"
+	"github.com/go-juno/juno/example/juno/init/flag"
 
 	"github.com/spf13/viper"
 )

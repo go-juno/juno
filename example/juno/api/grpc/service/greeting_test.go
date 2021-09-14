@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"juno/api/grpc/protos"
-	"juno/internal/constant"
+	"github.com/go-juno/juno/example/juno/api/grpc/protos"
+	"github.com/go-juno/juno/example/juno/internal/constant"
 	"google.golang.org/grpc"
 )
 

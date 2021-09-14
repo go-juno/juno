@@ -24,3 +24,6 @@ var GrpcService string
 
 //go:embed tpl/grpc_proto.tpl
 var GrpcProto string
+
+//go:embed tpl/mod.tpl
+var ModTpl string

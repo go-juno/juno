@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 
-	"juno/internal/constant"
+	"github.com/go-juno/juno/example/juno/internal/constant"
 
 	"golang.org/x/sync/errgroup"
 )

@@ -3,8 +3,8 @@ package endpoint
 import (
 	"context"
 
-	"juno/internal/model"
-	model2 "juno/pkg/model"
+	"github.com/go-juno/juno/example/juno/internal/model"
+	model2 "github.com/go-juno/juno/example/juno/pkg/model"
 	"golang.org/x/xerrors"
 )
 

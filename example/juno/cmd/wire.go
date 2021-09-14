@@ -1,3 +1,4 @@
+//go:build wireinject
 // +build wireinject
 
 // The build tag makes sure the stub is not built in the final build.
@@ -5,12 +6,12 @@
 package cmd
 
 import (
-	"juno/api/grpc"
-	sv "juno/api/grpc/service"
-	"juno/api/http"
-	"juno/internal/database"
-	"juno/internal/endpoint"
-	"juno/internal/service"
+	"github.com/go-juno/juno/example/juno/api/grpc"
+	sv "github.com/go-juno/juno/example/juno/api/grpc/service"
+	"github.com/go-juno/juno/example/juno/api/http"
+	"github.com/go-juno/juno/example/juno/internal/database"
+	"github.com/go-juno/juno/example/juno/internal/endpoint"
+	"github.com/go-juno/juno/example/juno/internal/service"
 	"github.com/google/wire"
 	http2 "net/http"
 

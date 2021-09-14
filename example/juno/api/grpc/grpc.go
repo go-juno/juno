@@ -1,8 +1,8 @@
 package grpc
 
 import (
-	"juno/api/grpc/protos"
-	"juno/api/grpc/service"
+	"github.com/go-juno/juno/example/juno/api/grpc/protos"
+	"github.com/go-juno/juno/example/juno/api/grpc/service"
 	"google.golang.org/grpc"
 )
 

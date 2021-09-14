@@ -1,12 +1,12 @@
 package handle
 
 import (
-	"juno/api/http/schema"
-	"juno/api/http/serialize"
-	"juno/pkg/res"
+	"github.com/go-juno/juno/example/juno/api/http/schema"
+	"github.com/go-juno/juno/example/juno/api/http/serialize"
+	"github.com/go-juno/juno/example/juno/pkg/res"
 	"golang.org/x/xerrors"
 
-	"juno/internal/endpoint"
+	"github.com/go-juno/juno/example/juno/internal/endpoint"
 
 	"github.com/gin-gonic/gin"
 )

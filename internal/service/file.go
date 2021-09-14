@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/static"
 	"golang.org/x/xerrors"
 )
 
@@ -25,7 +26,7 @@ type FileService interface {
 	CopyFile(src, dst string) (ok bool, err error)
 	ReadAll(filePth string) ([]byte, error)
 	ReplaceAll(root, old, new string) (err error)
-	ReplaceMod(root string) error
+	CreateMod(root string) error
 	ReplaceMain(root, old, new string) error
 }
 
@@ -240,19 +241,22 @@ func (s *fileService) ReplaceAll(root, old, new string) (err error) {
 	return err
 }
 
-func (s *fileService) ReplaceMod(root string) error {
+func (s *fileService) CreateMod(root string) (err error) {
 	path := fmt.Sprintf("%s/go.mod", root)
-	text, err := s.ReadAll(path)
+	var ok bool
+	ok, err = s.IsExistsFile(path)
 	if err != nil {
-		return err
+		err = xerrors.Errorf("%w", err)
+		return
 	}
-	str := string(text)
-	reg := regexp.MustCompile(`(replace \([\s\S]*?\))`)
-	str = reg.ReplaceAllString(str, "")
-	if err := s.WriteToFile(path, str); err != nil {
-		return err
+
+	if !ok {
+		str := static.ModTpl
+		if err = s.WriteToFile(path, str); err != nil {
+			return
+		}
 	}
-	return nil
+	return
 }
 
 func (s *fileService) ReplaceMain(root, old, new string) error {

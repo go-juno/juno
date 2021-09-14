@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"juno/internal/constant"
-	"juno/internal/model"
+	"github.com/go-juno/juno/example/juno/internal/constant"
+	"github.com/go-juno/juno/example/juno/internal/model"
 
 	"golang.org/x/xerrors"
 	"gorm.io/driver/mysql"

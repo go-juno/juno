@@ -1,6 +1,6 @@
 package schema
 
-import "juno/internal/endpoint"
+import "github.com/go-juno/juno/example/juno/internal/endpoint"
 
 type GetGreetingList struct {
 	PageIndex int `form:"page_index" json:"page_index" binding:"required,min=1"`

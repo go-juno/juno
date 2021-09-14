@@ -3,7 +3,7 @@ package constant
 import (
 	"os"
 
-	"juno/init/config"
+	"github.com/go-juno/juno/example/juno/init/config"
 )
 
 var (

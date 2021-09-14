@@ -1,7 +1,7 @@
 package service
 
 import (
-	"juno/internal/model"
+	"github.com/go-juno/juno/example/juno/internal/model"
 	"golang.org/x/xerrors"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"

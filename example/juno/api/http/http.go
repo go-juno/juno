@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"juno/api/http/handle"
-	"juno/api/http/middleware"
-	"juno/internal/constant"
-	"juno/internal/endpoint"
-	"juno/static"
+	"github.com/go-juno/juno/example/juno/api/http/handle"
+	"github.com/go-juno/juno/example/juno/api/http/middleware"
+	"github.com/go-juno/juno/example/juno/internal/constant"
+	"github.com/go-juno/juno/example/juno/internal/endpoint"
+	"github.com/go-juno/juno/example/juno/static"
 
 	"github.com/gin-gonic/gin"
 )

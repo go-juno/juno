@@ -41,21 +41,18 @@ func (e *Endpoints) CreateProjectEndpoint(request *CreateProjectRequest) (err er
 	dest := fmt.Sprintf("%s/%s", pwd, request.Name)
 	var ok bool
 	ok, err = e.file.CopyPath(srcDir, dest)
-
 	if !ok {
 		panic(errors.New("Copy dir failed"))
 	}
 	log.Println(" > ok")
-
+	if err := e.file.CreateMod(dest); err != nil {
+		panic(errors.New("Replace go.mod failed"))
+	}
 	log.Println(" - Processing package name")
 	if err := e.file.ReplaceAll(dest, "juno", request.Name); err != nil {
 		panic(errors.New("Replace failed"))
 	}
-	if err := e.file.ReplaceMod(dest); err != nil {
-		panic(errors.New("Replace go.mod failed"))
-	}
 	log.Println(" > ok")
-
 	log.Printf("Project '%s' is generated", request.Name)
 	return
 }

@@ -7,7 +7,7 @@ import (
 	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
-	"juno/pkg/res"
+	"github.com/go-juno/juno/example/juno/pkg/res"
 )
 
 //处理错误的中间件

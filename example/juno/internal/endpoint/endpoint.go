@@ -1,7 +1,7 @@
 package endpoint
 
 import (
-	"juno/internal/service"
+	"github.com/go-juno/juno/example/juno/internal/service"
 
 	"github.com/google/wire"
 )

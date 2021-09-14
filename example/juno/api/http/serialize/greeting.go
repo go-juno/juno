@@ -1,7 +1,7 @@
 package serialize
 
 import (
-	"juno/internal/endpoint"
+	"github.com/go-juno/juno/example/juno/internal/endpoint"
 )
 
 type GetGreetingList struct {

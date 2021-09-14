@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"juno/pkg/util"
+	"github.com/go-juno/juno/example/juno/pkg/util"
 )
 
 type Status string
