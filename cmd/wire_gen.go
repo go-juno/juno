@@ -16,9 +16,10 @@ import (
 
 // initApp init endpoints
 func InitServer() ([]*cli.Command, error) {
+	baseEnvService := service.NewBaseEnvService()
 	fileService := service.NewFileService()
 	modService := service.NewModService()
-	endpoints := endpoint.NewEndpoints(fileService, modService)
+	endpoints := endpoint.NewEndpoints(baseEnvService, fileService, modService)
 	v := command.GenCommandList(endpoints)
 	return v, nil
 }

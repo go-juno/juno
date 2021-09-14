@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -449,6 +450,5 @@ func (t *application) printCommandOptions() {
 func (t *application) version() {
 	appName := t.Name
 	appVersion := t.Version
-	frameworkVersion := Version
-	fmt.Printf("%s %s, framework %s", appName, appVersion, frameworkVersion)
+	log.Printf("%s %s", appName, appVersion)
 }
