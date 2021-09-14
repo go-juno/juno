@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/go-juno/juno/pkg/util"
@@ -27,7 +26,6 @@ type FileService interface {
 	ReadAll(filePth string) ([]byte, error)
 	ReplaceAll(root, old, new string) (err error)
 	CreateMod(root string) error
-	ReplaceMain(root, old, new string) error
 }
 
 type fileService struct {
@@ -243,35 +241,11 @@ func (s *fileService) ReplaceAll(root, old, new string) (err error) {
 
 func (s *fileService) CreateMod(root string) (err error) {
 	path := fmt.Sprintf("%s/go.mod", root)
-	var ok bool
-	ok, err = s.IsExistsFile(path)
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
+	str := static.ModTpl
+	if err = s.WriteToFile(path, str); err != nil {
 		return
 	}
-
-	if !ok {
-		str := static.ModTpl
-		if err = s.WriteToFile(path, str); err != nil {
-			return
-		}
-	}
 	return
-}
-
-func (s *fileService) ReplaceMain(root, old, new string) error {
-	path := fmt.Sprintf("%s/main.go", root)
-	text, err := s.ReadAll(path)
-	if err != nil {
-		return err
-	}
-	str := string(text)
-	reg := regexp.MustCompile(old)
-	str = reg.ReplaceAllString(str, new)
-	if err := s.WriteToFile(path, str); err != nil {
-		return err
-	}
-	return nil
 }
 
 func NewFileService() FileService {
