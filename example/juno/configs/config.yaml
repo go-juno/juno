@@ -1,0 +1,12 @@
+server:
+  http:
+    port: 8080
+  grpc:
+    port: 8088
+database:
+  mysql:
+    user: root
+    password: 123456
+    host: 127.0.0.01
+    database: test
+    port: 3306
