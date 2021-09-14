@@ -1,4 +1,4 @@
-module github.com/go-juno/juno
+module github.com/go-juno/juno/example/juno
 
 go 1.16
 
