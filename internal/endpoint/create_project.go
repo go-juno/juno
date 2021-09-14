@@ -49,7 +49,7 @@ func (e *Endpoints) CreateProjectEndpoint(request *CreateProjectRequest) (err er
 		panic(errors.New("Replace go.mod failed"))
 	}
 	log.Println(" - Processing package name")
-	if err := e.file.ReplaceAll(dest, "juno", request.Name); err != nil {
+	if err := e.file.ReplaceAll(dest, "github.com/go-juno/juno/example/juno", request.Name); err != nil {
 		panic(errors.New("Replace failed"))
 	}
 	log.Println(" > ok")
