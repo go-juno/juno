@@ -41,14 +41,14 @@ func GreetingBluePrint(v1 *gin.RouterGroup, endpoints *endpoint.Endpoints) {
 **/
 func getGreetingList(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var scheme schema.GetGreetingList
-		err := c.ShouldBind(&scheme)
+		var schema schema.GetGreetingList
+		err := c.ShouldBind(&schema)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
 			res.ParamCheckRes(c, err)
 			return
 		}
-		req := scheme.Transform()
+		req := schema.Transform()
 		result, err := endpoints.GetGreetingListEndpoint(c, req)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
@@ -77,14 +77,14 @@ func getGreetingList(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 **/
 func getGreetingAll(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var scheme schema.GetGreetingAll
-		err := c.ShouldBind(&scheme)
+		var schema schema.GetGreetingAll
+		err := c.ShouldBind(&schema)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
 			res.ParamCheckRes(c, err)
 			return
 		}
-		req := scheme.Transform()
+		req := schema.Transform()
 		result, err := endpoints.GetGreetingAllEndpoint(c, req)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
@@ -113,14 +113,14 @@ func getGreetingAll(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 **/
 func getGreetingDetail(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var scheme schema.GetGreetingDetail
-		err := c.ShouldBind(&scheme)
+		var schema schema.GetGreetingDetail
+		err := c.ShouldBind(&schema)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
 			res.ParamCheckRes(c, err)
 			return
 		}
-		req := scheme.Transform()
+		req := schema.Transform()
 		result, err := endpoints.GetGreetingDetailEndpoint(c, req)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
@@ -146,14 +146,14 @@ func getGreetingDetail(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 **/
 func createGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var scheme schema.CreateGreeting
-		err := c.ShouldBind(&scheme)
+		var schema schema.CreateGreeting
+		err := c.ShouldBind(&schema)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
 			res.ParamCheckRes(c, err)
 			return
 		}
-		req := scheme.Transform()
+		req := schema.Transform()
 		result, err := endpoints.CreateGreetingEndpoint(c, req)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
@@ -180,14 +180,14 @@ func createGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 **/
 func updateGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var scheme schema.UpdateGreeting
-		err := c.ShouldBind(&scheme)
+		var schema schema.UpdateGreeting
+		err := c.ShouldBind(&schema)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
 			res.ParamCheckRes(c, err)
 			return
 		}
-		req := scheme.Transform()
+		req := schema.Transform()
 		result, err := endpoints.UpdateGreetingEndpoint(c, req)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
@@ -214,14 +214,14 @@ func updateGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 **/
 func deleteGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var scheme schema.DeleteGreeting
-		err := c.ShouldBind(&scheme)
+		var schema schema.DeleteGreeting
+		err := c.ShouldBind(&schema)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)
 			res.ParamCheckRes(c, err)
 			return
 		}
-		req := scheme.Transform()
+		req := schema.Transform()
 		result, err := endpoints.DeleteGreetingEndpoint(c, req)
 		if err != nil {
 			err = xerrors.Errorf("%w", err)

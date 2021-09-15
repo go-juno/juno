@@ -1,4 +1,4 @@
-package service
+package util
 
 import (
 	"errors"
@@ -6,32 +6,16 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
-	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/static"
 	"golang.org/x/xerrors"
 )
 
-type FileService interface {
-	IsExitsDir(dir string) (ok bool, err error)
-	IsExistsFile(path string) (ok bool, err error)
-	Mkdir(dir string) (err error)
-	TransformName(name string) (camel, class string)
-	Replace(content, mod string) (tpl string)
-	WriteToFile(fileName string, content string) error
-	CopyPath(src, dst string) (ok bool, err error)
-	CopyFile(src, dst string) (ok bool, err error)
-	ReadAll(filePth string) ([]byte, error)
-	ReplaceAll(root, old, new string) (err error)
-	CreateMod(root string) error
-}
-
-type fileService struct {
-}
-
-func (s *fileService) IsExitsDir(dir string) (ok bool, err error) {
+func IsExitsDir(dir string) (ok bool, err error) {
 	if _, err = os.Stat(dir); err != nil {
 		if !os.IsNotExist(err) {
 			ok = true
@@ -41,7 +25,7 @@ func (s *fileService) IsExitsDir(dir string) (ok bool, err error) {
 	return
 }
 
-func (s *fileService) IsExistsFile(path string) (ok bool, err error) {
+func IsExistsFile(path string) (ok bool, err error) {
 	_, err = os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
 		if !os.IsExist(err) {
@@ -54,9 +38,9 @@ func (s *fileService) IsExistsFile(path string) (ok bool, err error) {
 	return
 }
 
-func (s *fileService) Mkdir(dir string) (err error) {
+func Mkdir(dir string) (err error) {
 	var ok bool
-	ok, err = s.IsExitsDir(dir)
+	ok, err = IsExitsDir(dir)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -69,21 +53,25 @@ func (s *fileService) Mkdir(dir string) (err error) {
 	return nil
 }
 
-func (s *fileService) TransformName(name string) (camel, class string) {
-	camel = util.CamelString(name)
+func TransformName(name string) (camel, class, snake, hyphen string) {
+	camel = CamelString(name)
 	class = strings.Title(camel)
+	snake = SnakeString(camel)
+	hyphen = strings.ReplaceAll(snake, "_", "-")
+	return
+
+}
+
+func Replace(content, mod, camel, class, snake, hyphen string) (tpl string) {
+	tpl = strings.ReplaceAll(content, constant.TplMod, mod)
+	tpl = strings.ReplaceAll(tpl, constant.TplCamel, camel)
+	tpl = strings.ReplaceAll(tpl, constant.TplClass, class)
+	tpl = strings.ReplaceAll(tpl, constant.TplSnake, snake)
+	tpl = strings.ReplaceAll(tpl, constant.TplHyphen, hyphen)
 	return
 }
 
-func (s *fileService) Replace(content, mod string) (tpl string) {
-	camel, class := s.TransformName(mod)
-	tpl = strings.ReplaceAll(content, "juno", mod)
-	tpl = strings.ReplaceAll(tpl, "greeting", camel)
-	tpl = strings.ReplaceAll(tpl, "Greeting", class)
-	return
-}
-
-func (s *fileService) WriteToFile(fileName string, content string) (err error) {
+func WriteToFile(fileName string, content string) (err error) {
 	var f *os.File
 	f, err = os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	if err != nil {
@@ -104,7 +92,7 @@ func (s *fileService) WriteToFile(fileName string, content string) (err error) {
 	return
 }
 
-func (s *fileService) GetFileInfo(src string) os.FileInfo {
+func GetFileInfo(src string) os.FileInfo {
 	if fileInfo, e := os.Stat(src); e != nil {
 		if os.IsNotExist(e) {
 			return nil
@@ -115,7 +103,7 @@ func (s *fileService) GetFileInfo(src string) os.FileInfo {
 	}
 }
 
-func (s *fileService) CopyFile(src, dst string) (ok bool, err error) {
+func CopyFile(src, dst string) (ok bool, err error) {
 	if len(src) == 0 || len(dst) == 0 {
 		return
 	}
@@ -130,7 +118,7 @@ func (s *fileService) CopyFile(src, dst string) (ok bool, err error) {
 	dstPathArr := strings.Split(dst, "/")
 	dstPathArr = dstPathArr[0 : len(dstPathArr)-1]
 	dstPath := strings.Join(dstPathArr, "/")
-	dstFileInfo := s.GetFileInfo(dstPath)
+	dstFileInfo := GetFileInfo(dstPath)
 	if dstFileInfo == nil {
 		if err = os.MkdirAll(dstPath, os.ModePerm); err != nil {
 			return
@@ -151,7 +139,7 @@ func (s *fileService) CopyFile(src, dst string) (ok bool, err error) {
 	return
 }
 
-func (s *fileService) ReadAll(filePth string) ([]byte, error) {
+func ReadAll(filePth string) ([]byte, error) {
 	f, err := os.Open(filePth)
 	if err != nil {
 		return nil, err
@@ -159,9 +147,9 @@ func (s *fileService) ReadAll(filePth string) ([]byte, error) {
 	return ioutil.ReadAll(f)
 }
 
-func (s *fileService) CopyPath(src, dst string) (ok bool, err error) {
+func CopyPath(src, dst string) (ok bool, err error) {
 	src = strings.Replace(src, "\\", "/", -1)
-	srcFileInfo := s.GetFileInfo(src)
+	srcFileInfo := GetFileInfo(src)
 	if srcFileInfo == nil || !srcFileInfo.IsDir() {
 		return
 	}
@@ -178,7 +166,7 @@ func (s *fileService) CopyPath(src, dst string) (ok bool, err error) {
 
 		if !info.IsDir() {
 			var ok bool
-			ok, err = s.CopyFile(path, dstPath)
+			ok, err = CopyFile(path, dstPath)
 			if err != nil {
 				err = xerrors.Errorf("%w", err)
 				return err
@@ -212,7 +200,7 @@ func (s *fileService) CopyPath(src, dst string) (ok bool, err error) {
 	return
 }
 
-func (s *fileService) ReplaceAll(root, old, new string) (err error) {
+func ReplaceAll(root, old, new string) (err error) {
 	err = filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -221,7 +209,7 @@ func (s *fileService) ReplaceAll(root, old, new string) (err error) {
 		if !info.IsDir() {
 			// 替换内容
 			var text []byte
-			text, err = s.ReadAll(path)
+			text, err = ReadAll(path)
 
 			if err != nil {
 				err = xerrors.Errorf("%w", err)
@@ -229,7 +217,7 @@ func (s *fileService) ReplaceAll(root, old, new string) (err error) {
 			}
 			str := string(text)
 			str = strings.ReplaceAll(str, old, new)
-			if err := s.WriteToFile(path, str); err != nil {
+			if err := WriteToFile(path, str); err != nil {
 				return err
 			}
 		}
@@ -239,15 +227,21 @@ func (s *fileService) ReplaceAll(root, old, new string) (err error) {
 	return err
 }
 
-func (s *fileService) CreateMod(root string) (err error) {
+func CreateMod(root string) (err error) {
 	path := fmt.Sprintf("%s/go.mod", root)
 	str := static.ModTpl
-	if err = s.WriteToFile(path, str); err != nil {
+	if err = WriteToFile(path, str); err != nil {
 		return
 	}
 	return
 }
 
-func NewFileService() FileService {
-	return &fileService{}
+func FmtCode() (err error) {
+	cmd := exec.Command("gofmt", "-w", ".")
+	err = cmd.Run()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	return
 }

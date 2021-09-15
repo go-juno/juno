@@ -6,20 +6,29 @@ import (
 )
 
 type Endpoints struct {
-	baseEnv service.BaseEnvService
-	file    service.FileService
-	mod     service.ModService
+	baseEnv         service.BaseEnvService
+	mod             service.ModService
+	projectRelated  service.ProjectRelatedService
+	serviceRelated  service.ServiceRelatedService
+	endpointRelated service.EndpointRelatedService
+	httpRelated     service.HttpRelatedService
 }
 
 func NewEndpoints(
 	baseEnv service.BaseEnvService,
-	file service.FileService,
 	mod service.ModService,
+	projectRelated service.ProjectRelatedService,
+	serviceRelated service.ServiceRelatedService,
+	endpointRelated service.EndpointRelatedService,
+	httpRelated service.HttpRelatedService,
 ) *Endpoints {
 	return &Endpoints{
-		baseEnv: baseEnv,
-		file:    file,
-		mod:     mod,
+		baseEnv:         baseEnv,
+		mod:             mod,
+		projectRelated:  projectRelated,
+		serviceRelated:  serviceRelated,
+		endpointRelated: endpointRelated,
+		httpRelated:     httpRelated,
 	}
 }
 

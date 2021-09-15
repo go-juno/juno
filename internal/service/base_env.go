@@ -32,10 +32,26 @@ func (s *baseEnvService) GetGoEnvPath() (path string, err error) {
 
 func (s *baseEnvService) InstallEnv() (err error) {
 	// 下载protobuf
-	exec.Command("go", "get", "github.com/golang/protobuf/proto")
-	exec.Command("go", "get", "github.com/golang/protobuf/protoc-gen-go")
+	cmd := exec.Command("go", "get", "github.com/golang/protobuf/proto")
+	err = cmd.Run()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	cmd = exec.Command("go", "get", "github.com/golang/protobuf/protoc-gen-go")
+	err = cmd.Run()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
 	// 下载wire
-	exec.Command("go", "get", "wire")
+	cmd = exec.Command("go", "get", "wire")
+	err = cmd.Run()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
 	return
 }
 func NewBaseEnvService() BaseEnvService {
