@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,6 +26,16 @@ func (s *endpointRelatedService) CreateEndpoint(mod, name string) (err error) {
 
 	camel, class, snake, hyphen := util.TransformName(name)
 	fileName := filepath.Join(constant.EndpointDirPath, fmt.Sprintf("%s.go", snake))
+	var ok bool
+	ok, err = util.IsExistsFile(fileName)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if ok {
+		err = errors.New("File already exists")
+		return
+	}
 	err = util.Mkdir(constant.EndpointDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -54,6 +65,7 @@ func (s *endpointRelatedService) WireEndpoint(mod, name string) (err error) {
 	package endpoint
 	import (
 		"%s/internal/service"
+		
 		"github.com/google/wire"
 	)
 	type Endpoints struct {
@@ -86,6 +98,11 @@ func (s *endpointRelatedService) WireEndpoint(mod, name string) (err error) {
 			return
 		}
 		content = string(c)
+
+		exitsService := fmt.Sprintf(`%sService`, class)
+		if strings.Contains(content, exitsService) {
+			return
+		}
 
 	}
 	structString := fmt.Sprintf(`type Endpoints struct {

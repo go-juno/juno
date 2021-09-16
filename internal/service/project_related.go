@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/util"
@@ -32,6 +33,7 @@ func (s *projectRelatedService) CreateProject(name, goPath string) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+
 	if !ok {
 		err = xerrors.New("Copy dir failed")
 		return
@@ -41,7 +43,15 @@ func (s *projectRelatedService) CreateProject(name, goPath string) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+
 	err = util.ReplaceAll(dest, constant.ReplaceMod, name)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	cmd := exec.Command("go", "mod", "tidy")
+	cmd.Dir = dest
+	err = cmd.Run()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

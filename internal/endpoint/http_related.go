@@ -28,12 +28,20 @@ func (e *Endpoints) CreateHttpEndpoint(request *CreateHttpRequest) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	// 创建handle
+	err = e.httpRelated.CreateHandle(mod, request.Name)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
 	// 更新http
 	err = e.httpRelated.WireHttp(mod, request.Name)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+
 	err = util.FmtCode()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)

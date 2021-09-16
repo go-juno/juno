@@ -1,7 +1,7 @@
 package constant
 
 var (
-	Version         = "v0.0.6"
+	Version         = "v1.1.0"
 	ServiceDirPath  = "internal/service"
 	EndpointDirPath = "internal/endpoint"
 	HttpDirPath     = "api/http"
@@ -10,5 +10,6 @@ var (
 	TplCamel        = "greeting"
 	TplClass        = "Greeting"
 	TplSnake        = "greet_sb"
-	TplHyphen       = "greet-sb"
+	TplHyphen       = "greeting-router"
+	GrpcDirPath     = "api/grpc"
 )

@@ -8,7 +8,7 @@ import (
 )
 
 func Start() {
-	log.SetFlags(0)
+	log.SetFlags(log.Llongfile | log.LstdFlags)
 	commands, err := InitServer()
 	if err != nil {
 		panic(err)

@@ -29,6 +29,9 @@ func IsExistsFile(path string) (ok bool, err error) {
 	_, err = os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
 		if !os.IsExist(err) {
+			err = nil
+			return
+		} else {
 			err = xerrors.Errorf("%w", err)
 			return
 		}
@@ -63,11 +66,11 @@ func TransformName(name string) (camel, class, snake, hyphen string) {
 }
 
 func Replace(content, mod, camel, class, snake, hyphen string) (tpl string) {
-	tpl = strings.ReplaceAll(content, constant.TplMod, mod)
+	tpl = strings.ReplaceAll(content, constant.TplHyphen, hyphen)
+	tpl = strings.ReplaceAll(tpl, constant.TplMod, mod)
 	tpl = strings.ReplaceAll(tpl, constant.TplCamel, camel)
 	tpl = strings.ReplaceAll(tpl, constant.TplClass, class)
 	tpl = strings.ReplaceAll(tpl, constant.TplSnake, snake)
-	tpl = strings.ReplaceAll(tpl, constant.TplHyphen, hyphen)
 	return
 }
 
@@ -243,5 +246,17 @@ func FmtCode() (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	return
+}
+
+func GenProto(name string) (err error) {
+
+	cmd := exec.Command("protoc", "--go_out=paths=source_relative:.", "--go-grpc_out=paths=source_relative:.", "--go-grpc_opt=require_unimplemented_servers=false", fmt.Sprintf("api/grpc/protos/%s.proto", name))
+	err = cmd.Run()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
 	return
 }

@@ -9,4 +9,5 @@ var ProviderSet = wire.NewSet(
 	NewServiceRelatedService,
 	NewEndpointRelatedService,
 	NewHttpRelatedService,
+	NewGrpcRelatedService,
 )

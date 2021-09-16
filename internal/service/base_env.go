@@ -45,7 +45,7 @@ func (s *baseEnvService) InstallEnv() (err error) {
 		return
 	}
 	// 下载wire
-	cmd = exec.Command("go", "get", "wire")
+	cmd = exec.Command("go", "get", "github.com/google/wire")
 	err = cmd.Run()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)

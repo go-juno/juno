@@ -17,6 +17,7 @@ type HttpRelatedService interface {
 	CreateScheme(mod, name string) (err error)
 	CreateSerialize(mod, name string) (err error)
 	WireHttp(mod, name string) (err error)
+	CreateHandle(mod, name string) (err error)
 }
 
 type httpRelatedService struct {
@@ -27,6 +28,17 @@ func (s *httpRelatedService) CreateScheme(mod, name string) (err error) {
 	camel, class, snake, hyphen := util.TransformName(name)
 	httpSchemeDirPath := filepath.Join(constant.HttpDirPath, "schema")
 	schemaFileName := filepath.Join(httpSchemeDirPath, fmt.Sprintf("%s.go", snake))
+
+	var ok bool
+	ok, err = util.IsExistsFile(schemaFileName)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if ok {
+		// TODO 根据更新endpoint 更新service
+		return
+	}
 
 	err = util.Mkdir(httpSchemeDirPath)
 	if err != nil {
@@ -48,6 +60,17 @@ func (s *httpRelatedService) CreateSerialize(mod, name string) (err error) {
 	httpSerializeDirPath := filepath.Join(constant.HttpDirPath, "serialize")
 	serializeFileName := filepath.Join(httpSerializeDirPath, fmt.Sprintf("%s.go", snake))
 
+	var ok bool
+	ok, err = util.IsExistsFile(serializeFileName)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if ok {
+		// TODO 根据更新endpoint 更新service
+		return
+	}
+
 	err = util.Mkdir(httpSerializeDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -56,6 +79,37 @@ func (s *httpRelatedService) CreateSerialize(mod, name string) (err error) {
 	// 替换 模块
 	tpl := util.Replace(static.HttpSerializeTpl, mod, camel, class, snake, hyphen)
 	err = util.WriteToFile(serializeFileName, tpl)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	return
+}
+
+func (s *httpRelatedService) CreateHandle(mod, name string) (err error) {
+	camel, class, snake, hyphen := util.TransformName(name)
+	httpHandleDirPath := filepath.Join(constant.HttpDirPath, "handle")
+	handleFileName := filepath.Join(httpHandleDirPath, fmt.Sprintf("%s.go", snake))
+
+	var ok bool
+	ok, err = util.IsExistsFile(handleFileName)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if ok {
+		// TODO 根据更新endpoint 更新service
+		return
+	}
+
+	err = util.Mkdir(httpHandleDirPath)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	// 替换 模块
+	tpl := util.Replace(static.HttpHandleTpl, mod, camel, class, snake, hyphen)
+	err = util.WriteToFile(handleFileName, tpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

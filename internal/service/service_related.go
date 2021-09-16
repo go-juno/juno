@@ -1,9 +1,11 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -16,6 +18,7 @@ import (
 type ServiceRelatedService interface {
 	CreateService(mod, name string) (err error)
 	WireService(name string) (err error)
+	RunWire() (err error)
 }
 
 type serviceRelatedService struct {
@@ -25,6 +28,17 @@ func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
 
 	camel, class, snake, hyphen := util.TransformName(name)
 	fileName := filepath.Join(constant.ServiceDirPath, fmt.Sprintf("%s.go", snake))
+
+	var ok bool
+	ok, err = util.IsExistsFile(fileName)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if ok {
+		err = errors.New("File already exists")
+		return
+	}
 	err = util.Mkdir(constant.ServiceDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -53,6 +67,7 @@ func (s *serviceRelatedService) WireService(name string) (err error) {
 		`
 	var ok bool
 	ok, err = util.IsExistsFile(serviceFilePath)
+
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -71,11 +86,26 @@ func (s *serviceRelatedService) WireService(name string) (err error) {
 			return
 		}
 		content = string(c)
+		exitsService := fmt.Sprintf(`New%sService`, class)
+		if strings.Contains(content, exitsService) {
+			return
+		}
+
 	}
 	newServiceString := fmt.Sprintf(`New%sService,
-)`, class)
+	)`, class)
 	file := strings.ReplaceAll(content, ")", newServiceString)
 	err = util.WriteToFile(serviceFilePath, file)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	return
+}
+
+func (s *serviceRelatedService) RunWire() (err error) {
+	cmd := exec.Command("wire", "./cmd/wire.go")
+	err = cmd.Run()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

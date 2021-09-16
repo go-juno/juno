@@ -5,39 +5,34 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type CreateServiceRequest struct {
+type CreateGrpcRequest struct {
 	Name string
 }
 
-func (e *Endpoints) CreateServiceEndpoint(request *CreateServiceRequest) (err error) {
+func (e *Endpoints) CreateGrpcEndpoint(request *CreateGrpcRequest) (err error) {
 	//  获取mod
 	mod, err := e.mod.GetMod()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	// 先创建内容
-	err = e.serviceRelated.CreateService(mod, request.Name)
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
-	// 更新servcie wire
-	err = e.serviceRelated.WireService(request.Name)
+
+	// 创建proto
+	err = e.grpcRelated.CreateProto(mod, request.Name)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
 
-	// 更新endpoint wire
-	err = e.endpointRelated.WireEndpoint(mod, request.Name)
+	// 创建Service
+	err = e.grpcRelated.CreateService(mod, request.Name)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
 
-	//生成wire
-	err = e.serviceRelated.RunWire()
+	// Wire Grpc
+	err = e.grpcRelated.WireGrpc(mod, request.Name)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -48,6 +43,5 @@ func (e *Endpoints) CreateServiceEndpoint(request *CreateServiceRequest) (err er
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-
 	return
 }

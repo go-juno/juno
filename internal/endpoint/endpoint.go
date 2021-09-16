@@ -12,6 +12,7 @@ type Endpoints struct {
 	serviceRelated  service.ServiceRelatedService
 	endpointRelated service.EndpointRelatedService
 	httpRelated     service.HttpRelatedService
+	grpcRelated     service.GrpcRelatedService
 }
 
 func NewEndpoints(
@@ -21,6 +22,7 @@ func NewEndpoints(
 	serviceRelated service.ServiceRelatedService,
 	endpointRelated service.EndpointRelatedService,
 	httpRelated service.HttpRelatedService,
+	grpcRelated service.GrpcRelatedService,
 ) *Endpoints {
 	return &Endpoints{
 		baseEnv:         baseEnv,
@@ -29,6 +31,7 @@ func NewEndpoints(
 		serviceRelated:  serviceRelated,
 		endpointRelated: endpointRelated,
 		httpRelated:     httpRelated,
+		grpcRelated:     grpcRelated,
 	}
 }
 
