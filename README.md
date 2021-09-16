@@ -45,22 +45,22 @@ go install github.com/go-juno/juno@latest
 
 ```
 # 创建项目模板
-github.com/go-juno/juno new helloworld
+juno new helloworld
 cd helloworld
 # 拉取项目依赖
 go mod download
 
 # 生成service模板
-github.com/go-juno/juno service hello
+juno service hello
 
 # 生成endpoint模板
-github.com/go-juno/juno endpoint hello
+juno endpoint hello
 
 # 生成http模板
-github.com/go-juno/juno http hello
+juno http hello
 
 # 生成grpc模板
-github.com/go-juno/juno grpc hello
+juno grpc hello
 
 ```
 
