@@ -1,7 +1,7 @@
 package constant
 
 var (
-	Version         = "v1.1.0"
+	Version         = "v1.1.1"
 	ServiceDirPath  = "internal/service"
 	EndpointDirPath = "internal/endpoint"
 	HttpDirPath     = "api/http"
