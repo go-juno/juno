@@ -1,8 +1,8 @@
-# github.com/go-juno/juno
+# Juno
 
 ---
 
-> github.com/go-juno/juno 是一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具。
+> juno 是一套轻量级 Go 微服务框架，包含大量微服务相关框架及工具。
 
 ## 特点
 

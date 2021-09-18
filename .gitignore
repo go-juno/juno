@@ -155,4 +155,4 @@ Temporary Items
 configs/*
 !configs/config.yaml
 
-./juno
+juno
