@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/go-juno/juno/internal/constant"
@@ -71,6 +72,13 @@ func Replace(content, mod, camel, class, snake, hyphen string) (tpl string) {
 	tpl = strings.ReplaceAll(tpl, constant.TplCamel, camel)
 	tpl = strings.ReplaceAll(tpl, constant.TplClass, class)
 	tpl = strings.ReplaceAll(tpl, constant.TplSnake, snake)
+	return
+}
+
+func ReplaceHttp(content, mod, camel, class, snake, hyphen, apiPrefix string) (tpl string) {
+	tpl = strings.ReplaceAll(content, fmt.Sprintf("/api/%s", constant.TplHyphen), fmt.Sprintf("%s/%s", apiPrefix, constant.TplHyphen))
+	tpl = Replace(tpl, mod, camel, class, snake, hyphen)
+
 	return
 }
 
@@ -258,5 +266,25 @@ func GenProto(name string) (err error) {
 		return
 	}
 
+	return
+}
+
+func GetApiPrefix() (apiPrefix string, err error) {
+	file, err := os.Open("api/http/http.go")
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	defer file.Close()
+	var content []byte
+	content, err = ioutil.ReadAll(file)
+	reg, err := regexp.Compile(`"/api/(.*)"`)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	info := reg.Find(content)
+	apiPrefix = strings.TrimSpace(string(info))
+	apiPrefix = strings.ReplaceAll(apiPrefix, `"`, "")
 	return
 }
