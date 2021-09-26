@@ -107,8 +107,16 @@ func (s *httpRelatedService) CreateHandle(mod, name string) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+
+	var apiPrefix string
+	apiPrefix, err = util.GetApiPrefix()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
 	// 替换 模块
-	tpl := util.Replace(static.HttpHandleTpl, mod, camel, class, snake, hyphen)
+	tpl := util.ReplaceHttp(static.HttpHandleTpl, mod, camel, class, snake, hyphen, apiPrefix)
 	err = util.WriteToFile(handleFileName, tpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)

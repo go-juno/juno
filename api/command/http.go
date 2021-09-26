@@ -26,6 +26,7 @@ func (t *CreateHttpCommand) Main() {
 	err := t.endpoint.CreateHttpEndpoint(req)
 	if err != nil {
 		log.Println(util.Unwrap(err).Error())
+		// log.Printf("err: %+v", err)
 	}
 
 }
