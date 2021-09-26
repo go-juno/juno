@@ -1,7 +1,9 @@
 package constant
 
+import "github.com/go-juno/juno/init/version"
+
 var (
-	Version         = "v1.1.2"
+	Version         = version.Version
 	ServiceDirPath  = "internal/service"
 	EndpointDirPath = "internal/endpoint"
 	HttpDirPath     = "api/http"
