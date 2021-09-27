@@ -1,11 +1,14 @@
 package version
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
+	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
+
+	"golang.org/x/xerrors"
 )
 
 var Version = "v1.0.0"
@@ -36,9 +39,28 @@ func CompareVersion(version1 string, version2 string) int {
 	return 0
 }
 
+func GetGoEnvPath() (path string, err error) {
+	envCmd := "go env GOPATH"
+	cmd := exec.Command("go", "env", "GOPATH")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	path = string(out[:len(out)-1])
+	if path == "" {
+		err = xerrors.Errorf("$GOPATH is not configured, see '%s'\n", envCmd)
+		return
+	}
+	return
+}
+
 func init() {
-	srcDir := fmt.Sprintf("%s/pkg/mod/github.com/go-juno/", "/Users/joker/go")
-	fileList, err := ioutil.ReadDir(srcDir)
+	path, err := GetGoEnvPath()
+	if err != nil {
+		panic(err)
+	}
+	fileList, err := ioutil.ReadDir(filepath.Join(path, "pkg/mod/github.com/go-juno/"))
 	if err != nil {
 		log.Println("err", err)
 	}
