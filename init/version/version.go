@@ -2,7 +2,6 @@ package version
 
 import (
 	"io/ioutil"
-	"log"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -62,7 +61,7 @@ func init() {
 	}
 	fileList, err := ioutil.ReadDir(filepath.Join(path, "pkg/mod/github.com/go-juno/"))
 	if err != nil {
-		log.Println("err", err)
+		panic(err)
 	}
 	for _, file := range fileList {
 		list := strings.Split(file.Name(), "juno@")
