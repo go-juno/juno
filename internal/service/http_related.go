@@ -126,7 +126,7 @@ func (s *httpRelatedService) CreateHandle(mod, name string) (err error) {
 }
 
 func (s *httpRelatedService) WireHttp(mod, name string) (err error) {
-	camel, class, _, _ := util.TransformName(name)
+	_, class, _, _ := util.TransformName(name)
 	err = util.Mkdir(constant.HttpDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -134,22 +134,34 @@ func (s *httpRelatedService) WireHttp(mod, name string) (err error) {
 	}
 	// wire add http
 	httpFilePath := filepath.Join(constant.HttpDirPath, "http.go")
-	var content string = fmt.Sprintf(`
-	package http
+	var content string = fmt.Sprintf(`package http
 	import (
-		"%s/internal/service"
-		"github.com/google/wire"
+		"fmt"
+		"%s/api/http/middleware"
+		"net/http"
+	
+		"%s/api/http/handle"
+		"%s/internal/constant"
+		"%s/internal/endpoint"
+		"%s/static"
+	
+		"github.com/gin-gonic/gin"
 	)
-	type Https struct {
+	
+	func NewHttp(endpoints *endpoint.Endpoints) *http.Server {
+		ginEngine := gin.New()
+		ginEngine.Use(middleware.ErrMiddleware)
+		api := ginEngine.Group("/api")
+	    api.GET("/doc", func(ctx *gin.Context) {
+		ctx.Header("Content-Type", "text/html; charset=utf-8")
+		ctx.String(200, static.ApiDoc)
+	})
+	s := &http.Server{
+		Addr:    fmt.Sprintf(":%%d", constant.Config.Server.Http.Port),
+		Handler: ginEngine,
 	}
-		
-	func NewHttps(
-	) *Https {
-		return &Https{
-		}
-	}
-	var ProviderSet = wire.NewSet(NewHttps)
-	`, mod)
+	return s
+}`, mod, mod, mod, mod, mod)
 	var ok bool
 	ok, err = util.IsExistsFile(httpFilePath)
 	if err != nil {
@@ -170,17 +182,15 @@ func (s *httpRelatedService) WireHttp(mod, name string) (err error) {
 			return
 		}
 		content = string(c)
+		exitsService := fmt.Sprintf(`%sBluePrint`, class)
+		if strings.Contains(content, exitsService) {
+			return
+		}
 
 	}
-	structString := fmt.Sprintf(`type Https struct {
-	%s service.%sService`, camel, class)
-	paramString := fmt.Sprintf(`func NewHttps(
-	%s service.%sService,`, camel, class)
-	classString := fmt.Sprintf(`return &Https{
-		%s:            %s,`, camel, camel)
-	content = strings.ReplaceAll(content, "type Https struct {", structString)
-	content = strings.ReplaceAll(content, "func NewHttps(", paramString)
-	content = strings.ReplaceAll(content, "return &Https{", classString)
+	structString := fmt.Sprintf(`handle.%sBluePrint(api, endpoints)
+	s := &http.Server{`, class)
+	content = strings.ReplaceAll(content, "s := &http.Server{", structString)
 	err = util.WriteToFile(httpFilePath, content)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
