@@ -7,11 +7,12 @@ import (
 )
 
 func main() {
-	filePath := "/Users/joker/coding/miao-promotion/internal/endpoint/appraise_committee.go"
+	filePath := "/Users/dz0400145/coding/miao-hc/internal/endpoint/dept.go"
 	f, err := ast.GetAstFile(filePath)
 	if err != nil {
 		panic(err)
 	}
+
 	reqList, resList := ast.GetStruct(f)
 	for _, s := range reqList {
 		log.Println("req", s)

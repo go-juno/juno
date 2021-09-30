@@ -18,6 +18,7 @@ func GetAstFile(filePath string) (f *ast.File, err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	ast.Print(fset, f)
 	return
 }
 
@@ -33,6 +34,7 @@ type ResponseStruct struct {
 func GetStruct(f *ast.File) (requestStruct []*RequestStruct, responseStruct []*ResponseStruct) {
 	requestStruct = make([]*RequestStruct, 0)
 	responseStruct = make([]*ResponseStruct, 0)
+
 	for _, decl := range f.Decls {
 		genDecl, ok := decl.(*ast.GenDecl)
 		if ok {
@@ -52,9 +54,19 @@ func GetStruct(f *ast.File) (requestStruct []*RequestStruct, responseStruct []*R
 					if ok {
 						for _, field := range specType.Fields.List {
 							typeName := ""
-							tp, ok := field.Type.(*ast.Ident)
-							if ok {
-								typeName = tp.Name
+							switch filedType := field.Type.(type) {
+							case *ast.Ident:
+								typeName = filedType.Name
+							case *ast.ArrayType:
+								switch elt := filedType.Elt.(type) {
+								case *ast.Ident:
+									typeName = elt.Name
+								case *ast.StarExpr:
+
+								default:
+
+								}
+							default:
 							}
 
 							structString += fmt.Sprintf(`
