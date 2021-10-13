@@ -17,7 +17,7 @@ type LocalTime struct {
 
 func (t LocalTime) MarshalJSON() ([]byte, error) {
 	if !t.IsZero() {
-		dateString := t.Format(time.RFC3339)
+		dateString := t.Format("2006-01-02 15:04:05")
 		return json.Marshal(dateString)
 	} else {
 		return json.Marshal(nil)
@@ -30,16 +30,13 @@ func (t *LocalTime) UnmarshalJSON(b []byte) (err error) {
 		t.Time = time.Time{}
 		return
 	}
-	t.Time, err = time.Parse("2006-01-02 15:04:05", s)
+	t.Time, err = time.ParseInLocation("2006-01-02 15:04:05", s, time.Local)
 	return
 }
 
 func (t LocalTime) Value() (driver.Value, error) {
-	var zeroTime time.Time
-	if t.UnixNano() == zeroTime.UnixNano() {
-		return nil, nil
-	}
-	return t.Format(time.RFC3339), nil
+
+	return t.Format("2006-01-02 15:04:05"), nil
 }
 
 func (t *LocalTime) Scan(v interface{}) error {
@@ -124,10 +121,6 @@ func (t *LocalDate) UnmarshalJSON(b []byte) (err error) {
 }
 
 func (t LocalDate) Value() (driver.Value, error) {
-	var zeroTime time.Time
-	if t.UnixNano() == zeroTime.UnixNano() {
-		return nil, nil
-	}
 	return t.Format("2006-01-02"), nil
 }
 

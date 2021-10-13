@@ -14,16 +14,15 @@ import (
 func ErrMiddleware(c *gin.Context) {
 	defer func() {
 		if r := recover(); r != nil {
-			err := r.(error)
-			log.Printf("err:%+v\n stack:%s", err, string(debug.Stack()))
-			res := res.Response{
+			log.Printf("err:%+v\n stack:%s", r, string(debug.Stack()))
+			response := res.Response{
 				Status: res.SystemError,
 				Msg:    fmt.Sprintf("%v", r),
 				Data:   nil,
 			}
-			c.AbortWithStatusJSON(http.StatusOK, res)
+			c.AbortWithStatusJSON(http.StatusOK, response)
+			return
 		}
 	}()
 	c.Next()
-
 }

@@ -1,6 +1,6 @@
 repos:
   - repo: git://github.com/joker8023/pre-commit-golang
-    rev: v1.4
+    rev: v1.9
     hooks:
       - id: go-fmt
       - id: go-vet
@@ -8,3 +8,4 @@ repos:
       - id: golangci-lint
       - id: go-build
       - id: go-mod-tidy
+      - id: api-doc
