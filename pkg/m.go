@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("/Users/dz0400145/coding/miao-recruitment/internal/endpoint/apply.go")
+	file, err := os.Open("/Users/dz0400145/coding/miao-recruitment/internal/endpoint/interview.go")
 	if err != nil {
 		log.Println("err", err)
 		return
@@ -21,10 +21,11 @@ func main() {
 		log.Println("err", err)
 		return
 	}
-
-	err = util.GetRequestStruct(string(content))
+	var ss string
+	ss, err = util.GenAllRequestStruct(string(content))
 	if err != nil {
 		log.Println("err", err)
 		return
 	}
+	log.Println("ss", ss)
 }
