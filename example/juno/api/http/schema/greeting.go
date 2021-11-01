@@ -4,7 +4,7 @@ import "github.com/go-juno/juno/example/juno/internal/endpoint"
 
 type GetGreetingList struct {
 	PageIndex int `form:"page_index" json:"page_index" binding:"required,min=1"`
-	PageSize  int `form:"page_size" json:"page_size" binding:"required,min=1,max=100"`
+	PageSize  int `form:"page_size" json:"page_size" binding:"required,min=1"`
 }
 
 func (s *GetGreetingList) Transform() *endpoint.GetGreetingListRequest {
@@ -24,7 +24,7 @@ func (s *GetGreetingAll) Transform() *endpoint.GetGreetingAllRequest {
 }
 
 type GetGreetingDetail struct {
-	Id uint `form:"id" json:"id" binding:"required"`
+	Id uint `form:"id" json:"id" binding:"required,min=1"`
 }
 
 func (s *GetGreetingDetail) Transform() *endpoint.GetGreetingDetailRequest {
@@ -43,7 +43,7 @@ func (s *CreateGreeting) Transform() *endpoint.CreateGreetingRequest {
 }
 
 type UpdateGreeting struct {
-	Id uint `form:"id" json:"id" binding:"required"`
+	Id uint `form:"id" json:"id" binding:"required,min=1"`
 }
 
 func (s *UpdateGreeting) Transform() *endpoint.UpdateGreetingRequest {
@@ -54,7 +54,7 @@ func (s *UpdateGreeting) Transform() *endpoint.UpdateGreetingRequest {
 }
 
 type DeleteGreeting struct {
-	Id uint `form:"id" json:"id" binding:"required"`
+	Id uint `form:"id" json:"id" binding:"required,min=1"`
 }
 
 func (s *DeleteGreeting) Transform() *endpoint.DeleteGreetingRequest {

@@ -1,6 +1,7 @@
 package util
 
 import (
+	"os"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -57,4 +58,9 @@ func CamelString(s string) string {
 		data = append(data, d)
 	}
 	return string(data[:])
+}
+
+func GetPwd() (dir string) {
+	dir, _ = os.Getwd()
+	return
 }

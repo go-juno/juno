@@ -25,7 +25,8 @@ type endpointRelatedService struct {
 func (s *endpointRelatedService) CreateEndpoint(mod, name string) (err error) {
 
 	camel, class, snake, hyphen := util.TransformName(name)
-	fileName := filepath.Join(constant.EndpointDirPath, fmt.Sprintf("%s.go", snake))
+	endpointDir := filepath.Join(util.GetPwd(), constant.EndpointDirPath)
+	fileName := filepath.Join(endpointDir, fmt.Sprintf("%s.go", snake))
 	var ok bool
 	ok, err = util.IsExistsFile(fileName)
 	if err != nil {
@@ -36,7 +37,7 @@ func (s *endpointRelatedService) CreateEndpoint(mod, name string) (err error) {
 		err = errors.New("File already exists")
 		return
 	}
-	err = util.Mkdir(constant.EndpointDirPath)
+	err = util.Mkdir(endpointDir)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -54,13 +55,14 @@ func (s *endpointRelatedService) CreateEndpoint(mod, name string) (err error) {
 
 func (s *endpointRelatedService) WireEndpoint(mod, name string) (err error) {
 	camel, class, _, _ := util.TransformName(name)
-	err = util.Mkdir(constant.EndpointDirPath)
+	endpointDir := filepath.Join(util.GetPwd(), constant.EndpointDirPath)
+	err = util.Mkdir(endpointDir)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
 	// wire add endpoint
-	endpointFilePath := filepath.Join(constant.EndpointDirPath, "endpoint.go")
+	endpointFilePath := filepath.Join(endpointDir, "endpoint.go")
 	var content string = fmt.Sprintf(`
 	package endpoint
 	import (

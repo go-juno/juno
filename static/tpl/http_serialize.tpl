@@ -1,24 +1,22 @@
 package serialize
 
-import (
-	"juno/internal/endpoint"
-)
+import "juno/internal/endpoint"
 
 type GetGreetingList struct {
 	Id uint `json:"id"`
 }
 
-func GetGreetingListTransform(e *endpoint.GetGreetingListResponse) (list *List) {
-	items := make([]*GetGreetingList, len(e.GreetingList))
-	list = &List{
+func GetGreetingListTransform(e *endpoint.GetGreetingListResponse) (res *List) {
+	items := make([]*GetGreetingList, len(e.Items))
+	res = &List{
 		Total: e.Total,
 	}
-	for index, greeting := range e.GreetingList {
+	for index, s := range e.Items {
 		items[index] = &GetGreetingList{
-			Id: greeting.Id,
+			Id: s.Id,
 		}
 	}
-	list.Items = items
+	res.Items = items
 	return
 }
 
@@ -26,11 +24,11 @@ type GetGreetingAll struct {
 	Id uint `json:"id"`
 }
 
-func GetGreetingAllTransform(e *endpoint.GetGreetingAllResponse) (res []*GetGreetingAll) {
-	res = make([]*GetGreetingAll, len(e.GreetingList))
-	for index, greeting := range e.GreetingList {
+func GetGreetingAllTransform(e []*endpoint.GetGreetingAllResponse) (res []*GetGreetingAll) {
+	res = make([]*GetGreetingAll, len(e))
+	for index, s := range e {
 		res[index] = &GetGreetingAll{
-			Id: greeting.Id,
+			Id: s.Id,
 		}
 	}
 	return
@@ -40,36 +38,41 @@ type GetGreetingDetail struct {
 	Id uint `json:"id"`
 }
 
-func GetGreetingDetailTransform(e *endpoint.GetGreetingDetailResponse) (res *GetGreetingDetail) {
-	if e.Greeting != nil {
+func GetGreetingDetailTransform(s *endpoint.GetGreetingDetailResponse) (res *GetGreetingDetail) {
+	if s != nil {
 		res = &GetGreetingDetail{
-			Id: e.Greeting.Id,
+			Id: s.Id,
 		}
 	}
-
 	return
 }
 
 type CreateGreeting struct {
 }
 
-func CreateGreetingTransform(e *endpoint.CreateGreetingResponse) (res *CreateGreeting) {
-	res = &CreateGreeting{}
+func CreateGreetingTransform(s *endpoint.CreateGreetingResponse) (res *CreateGreeting) {
+	if s != nil {
+		res = &CreateGreeting{}
+	}
 	return
 }
 
 type UpdateGreeting struct {
 }
 
-func UpdateGreetingTransform(e *endpoint.UpdateGreetingResponse) (res *UpdateGreeting) {
-	res = &UpdateGreeting{}
+func UpdateGreetingTransform(s *endpoint.UpdateGreetingResponse) (res *UpdateGreeting) {
+	if s != nil {
+		res = &UpdateGreeting{}
+	}
 	return
 }
 
 type DeleteGreeting struct {
 }
 
-func DeleteGreetingTransform(e *endpoint.DeleteGreetingResponse) (res *DeleteGreeting) {
-	res = &DeleteGreeting{}
+func DeleteGreetingTransform(s *endpoint.DeleteGreetingResponse) (res *DeleteGreeting) {
+	if s != nil {
+		res = &DeleteGreeting{}
+	}
 	return
 }

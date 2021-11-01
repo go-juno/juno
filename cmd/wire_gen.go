@@ -23,7 +23,8 @@ func InitServer() ([]*cli.Command, error) {
 	endpointRelatedService := service.NewEndpointRelatedService()
 	httpRelatedService := service.NewHttpRelatedService()
 	grpcRelatedService := service.NewGrpcRelatedService()
-	endpoints := endpoint.NewEndpoints(baseEnvService, modService, projectRelatedService, serviceRelatedService, endpointRelatedService, httpRelatedService, grpcRelatedService)
+	parseService := service.NewParseService()
+	endpoints := endpoint.NewEndpoints(baseEnvService, modService, projectRelatedService, serviceRelatedService, endpointRelatedService, httpRelatedService, grpcRelatedService, parseService)
 	v := command.GenCommandList(endpoints)
 	return v, nil
 }

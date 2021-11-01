@@ -3,9 +3,11 @@ package service
 import (
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/xerrors"
 )
 
@@ -17,7 +19,12 @@ type modService struct {
 }
 
 func (s *modService) GetMod() (mod string, err error) {
-	file, err := os.Open("go.mod")
+	modFile := filepath.Join(util.GetPwd(), "go.mod")
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	file, err := os.Open(modFile)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

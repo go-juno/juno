@@ -7,7 +7,6 @@ import (
 	"github.com/go-juno/juno/internal/endpoint"
 	"github.com/go-juno/juno/pkg/cli"
 	"github.com/go-juno/juno/pkg/cli/flag"
-	"github.com/go-juno/juno/pkg/util"
 )
 
 type CreateServiceCommand struct {
@@ -25,7 +24,7 @@ func (t *CreateServiceCommand) Main() {
 	}
 	err := t.endpoint.CreateServiceEndpoint(req)
 	if err != nil {
-		log.Println(util.Unwrap(err).Error())
+		log.Printf("err: %+v", err)
 	}
 
 }

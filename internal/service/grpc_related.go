@@ -28,7 +28,7 @@ func (s *grpcRelatedService) CreateProto(mod, name string) (err error) {
 	camel, class, snake, hyphen := util.TransformName(name)
 
 	// proto
-	grpcProtoDirPath := filepath.Join(constant.GrpcDirPath, "protos")
+	grpcProtoDirPath := filepath.Join(util.GetPwd(), constant.GrpcDirPath, "protos")
 	protoFileName := filepath.Join(grpcProtoDirPath, fmt.Sprintf("%s.proto", snake))
 	var ok bool
 	ok, err = util.IsExistsFile(protoFileName)
@@ -68,7 +68,7 @@ func (s *grpcRelatedService) CreateService(mod, name string) (err error) {
 	camel, class, snake, hyphen := util.TransformName(name)
 
 	// service
-	grpcServiceDirPath := filepath.Join(constant.GrpcDirPath, "service")
+	grpcServiceDirPath := filepath.Join(util.GetPwd(), constant.GrpcDirPath, "service")
 	serviceFileName := filepath.Join(grpcServiceDirPath, fmt.Sprintf("%s.go", snake))
 	err = util.Mkdir(grpcServiceDirPath)
 	if err != nil {
@@ -88,8 +88,7 @@ func (s *grpcRelatedService) CreateService(mod, name string) (err error) {
 }
 func (s *grpcRelatedService) WireService(mod, name string) (err error) {
 	_, class, snake, _ := util.TransformName(name)
-	serviceFilePath := filepath.Join(constant.GrpcDirPath, "service")
-
+	serviceFilePath := filepath.Join(util.GetPwd(), constant.GrpcDirPath, "service")
 	serviceFileName := filepath.Join(serviceFilePath, fmt.Sprintf("%s.go", snake))
 	var ok bool
 	ok, err = util.IsExistsFile(serviceFileName)
@@ -145,7 +144,7 @@ func (s *grpcRelatedService) WireService(mod, name string) (err error) {
 func (s *grpcRelatedService) WireGrpc(mod, name string) (err error) {
 	// wire add service
 	camel, class, _, _ := util.TransformName(name)
-	grpcFileName := filepath.Join(constant.GrpcDirPath, "grpc.go")
+	grpcFileName := filepath.Join(util.GetPwd(), constant.GrpcDirPath, "grpc.go")
 	var content string = fmt.Sprintf(`
 	package grpc
 

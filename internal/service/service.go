@@ -10,4 +10,5 @@ var ProviderSet = wire.NewSet(
 	NewEndpointRelatedService,
 	NewHttpRelatedService,
 	NewGrpcRelatedService,
+	NewParseService,
 )

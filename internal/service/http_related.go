@@ -14,20 +14,162 @@ import (
 )
 
 type HttpRelatedService interface {
-	CreateScheme(mod, name string) (err error)
-	CreateSerialize(mod, name string) (err error)
+	CreateSchema(mod, name string, methodList []*Method) (err error)
+	CreateSerialize(mod, name string, methodList []*Method) (err error)
 	WireHttp(mod, name string) (err error)
-	CreateHandle(mod, name string) (err error)
+	CreateHandle(mod, name string, methodList []*Method) (err error)
 }
 
 type httpRelatedService struct {
 }
 
-func (s *httpRelatedService) CreateScheme(mod, name string) (err error) {
+func genSchemaFile(mod, content string, methodList []*Method) (fileContent string) {
 
-	camel, class, snake, hyphen := util.TransformName(name)
-	httpSchemeDirPath := filepath.Join(constant.HttpDirPath, "schema")
-	schemaFileName := filepath.Join(httpSchemeDirPath, fmt.Sprintf("%s.go", snake))
+	if content == "" {
+		fileContent = fmt.Sprintf(`package schema
+import (
+	"%s/internal/endpoint"
+	"%s/internal/model"
+)
+			
+`, mod, mod)
+	} else {
+		fileContent = content
+	}
+
+	for _, method := range methodList {
+		if strings.Contains(fileContent, fmt.Sprintf("type %s struct", method.Request.Name)) {
+			continue
+		}
+
+		var fieldString, transformFieldString, transformFunc string
+		for _, field := range method.Request.FiledList {
+			fieldString += fmt.Sprintf("\t%s %s %s\n", field.Name, field.Type, field.Tag)
+			transformFieldString += fmt.Sprintf("\t\t%s: s.%s,\n", field.Name, field.Name)
+		}
+
+		if method.Request.IsList {
+			transformFunc = fmt.Sprintf(`func (sList []*%s) Transform() []*endpoint.%sRequest {
+				reqList := make([]*endpoint.%sRequest,len(s))
+				for index,s :=range sList{
+					reqList[index] =  &endpoint.%sRequest{
+%s
+					}
+				}
+				return reqList
+			}
+			`, method.Request.Name, method.Request.Name, method.Request.Name, method.Request.Name, transformFieldString)
+		} else {
+			transformFunc = fmt.Sprintf(`func (s *%s) Transform() *endpoint.%sRequest {
+				req := &endpoint.%sRequest{
+				%s
+				}
+				return req
+			}
+			`, method.Request.Name, method.Request.Name, method.Request.Name, transformFieldString)
+
+		}
+
+		structString := fmt.Sprintf(`type %s struct {
+%s
+}
+
+%s
+`, method.Request.Name, fieldString, transformFunc)
+		fileContent += structString
+	}
+
+	return
+
+}
+
+func genSerializeFile(mod, content string, methodList []*Method) (fileContent string) {
+
+	if content == "" {
+		fileContent = fmt.Sprintf(`package serialize
+import (
+	"%s/internal/endpoint"
+	"%s/internal/model"
+
+	model2 "git.yupaopao.com/ops-public/kit/model"
+)
+	
+`, mod, mod)
+
+	} else {
+		fileContent = content
+	}
+
+	for _, method := range methodList {
+		if strings.Contains(fileContent, fmt.Sprintf("type %s struct", method.Response.Name)) {
+			continue
+		}
+		var fieldString, transformFieldString, transformFunc string
+		for _, field := range method.Response.FiledList {
+			fieldString += fmt.Sprintf("\t%s %s %s\n", field.Name, field.Type, field.Tag)
+			transformFieldString += fmt.Sprintf("\t\t%s: s.%s,\n", field.Name, field.Name)
+		}
+
+		if method.Response.Pagination {
+			transformFunc = fmt.Sprintf(`func %sTransform(e *endpoint.%sResponse) (res *List) {
+				items := make([]*%s, len(e.Items))
+				res = &List{
+					Total: e.Total,
+				}
+				for index, s := range e.Items {
+					items[index] = &%s{
+						%s
+					}
+				}
+				res.Items = items
+				return
+			}
+				`, method.Response.Name, method.Response.Name, method.Response.Name, method.Response.Name, transformFieldString)
+
+		} else {
+			if method.Response.IsList {
+				transformFunc = fmt.Sprintf(`func %sTransform(e []*endpoint.%sResponse) (res []*%s) {
+				res = make([]*%s, len(e))
+				for index, s := range e {
+					res[index] = &%s{
+						%s
+					}
+				}
+				return
+			}
+				`, method.Request.Name, method.Response.Name, method.Response.Name, method.Response.Name, method.Response.Name, transformFieldString)
+			} else {
+				transformFunc = fmt.Sprintf(`func %sTransform(s *endpoint.%sResponse) (res *%s) {
+					if s != nil{
+						res = &%s{
+							%s
+						}
+					}
+					return
+				}
+				`, method.Response.Name, method.Response.Name, method.Response.Name, method.Response.Name, transformFieldString)
+
+			}
+		}
+
+		structString := fmt.Sprintf(`type %s struct {
+%s
+}
+
+%s
+`, method.Response.Name, fieldString, transformFunc)
+		fileContent += structString
+	}
+
+	return
+
+}
+
+func (s *httpRelatedService) CreateSchema(mod, name string, methodList []*Method) (err error) {
+
+	_, _, snake, _ := util.TransformName(name)
+	httpSchemaDirPath := filepath.Join(util.GetPwd(), constant.HttpDirPath, "schema")
+	schemaFileName := filepath.Join(httpSchemaDirPath, fmt.Sprintf("%s.go", snake))
 
 	var ok bool
 	ok, err = util.IsExistsFile(schemaFileName)
@@ -35,18 +177,26 @@ func (s *httpRelatedService) CreateScheme(mod, name string) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+
+	var content, tpl string
+
 	if ok {
-		// TODO 根据更新endpoint 更新service
-		return
+		var contentByte []byte
+		contentByte, err = util.ReadAll(schemaFileName)
+		if err != nil {
+			err = xerrors.Errorf("%w", err)
+			return
+		}
+		content = string(contentByte)
 	}
 
-	err = util.Mkdir(httpSchemeDirPath)
+	tpl = genSchemaFile(mod, content, methodList)
+
+	err = util.Mkdir(httpSchemaDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	// 替换 模块
-	tpl := util.Replace(static.HttpschemaTpl, mod, camel, class, snake, hyphen)
 	err = util.WriteToFile(schemaFileName, tpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -55,9 +205,9 @@ func (s *httpRelatedService) CreateScheme(mod, name string) (err error) {
 	return
 }
 
-func (s *httpRelatedService) CreateSerialize(mod, name string) (err error) {
-	camel, class, snake, hyphen := util.TransformName(name)
-	httpSerializeDirPath := filepath.Join(constant.HttpDirPath, "serialize")
+func (s *httpRelatedService) CreateSerialize(mod, name string, methodList []*Method) (err error) {
+	_, _, snake, _ := util.TransformName(name)
+	httpSerializeDirPath := filepath.Join(util.GetPwd(), constant.HttpDirPath, "serialize")
 	serializeFileName := filepath.Join(httpSerializeDirPath, fmt.Sprintf("%s.go", snake))
 
 	var ok bool
@@ -66,18 +216,23 @@ func (s *httpRelatedService) CreateSerialize(mod, name string) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	var tpl, content string
 	if ok {
-		// TODO 根据更新endpoint 更新service
-		return
+		var contentByte []byte
+		contentByte, err = util.ReadAll(serializeFileName)
+		if err != nil {
+			err = xerrors.Errorf("%w", err)
+			return
+		}
+		content = string(contentByte)
 	}
+	tpl = genSerializeFile(mod, content, methodList)
 
 	err = util.Mkdir(httpSerializeDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	// 替换 模块
-	tpl := util.Replace(static.HttpSerializeTpl, mod, camel, class, snake, hyphen)
 	err = util.WriteToFile(serializeFileName, tpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -86,9 +241,9 @@ func (s *httpRelatedService) CreateSerialize(mod, name string) (err error) {
 	return
 }
 
-func (s *httpRelatedService) CreateHandle(mod, name string) (err error) {
+func (s *httpRelatedService) CreateHandle(mod, name string, methodList []*Method) (err error) {
 	camel, class, snake, hyphen := util.TransformName(name)
-	httpHandleDirPath := filepath.Join(constant.HttpDirPath, "handle")
+	httpHandleDirPath := filepath.Join(util.GetPwd(), constant.HttpDirPath, "handle")
 	handleFileName := filepath.Join(httpHandleDirPath, fmt.Sprintf("%s.go", snake))
 
 	var ok bool
@@ -127,13 +282,14 @@ func (s *httpRelatedService) CreateHandle(mod, name string) (err error) {
 
 func (s *httpRelatedService) WireHttp(mod, name string) (err error) {
 	_, class, _, _ := util.TransformName(name)
-	err = util.Mkdir(constant.HttpDirPath)
+	httpDirPath := filepath.Join(util.GetPwd(), constant.HttpDirPath)
+	err = util.Mkdir(httpDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
 	// wire add http
-	httpFilePath := filepath.Join(constant.HttpDirPath, "http.go")
+	httpFilePath := filepath.Join(httpDirPath, "http.go")
 	var content string = fmt.Sprintf(`package http
 	import (
 		"fmt"

@@ -19,8 +19,8 @@ func (r *GreetingServer) GetList(ctx context.Context, in *protos.GetGreetingList
 		log.Printf("err:%+v", err)
 		return
 	}
-	item := make([]*protos.GetGreetingListReply_List, len(res.GreetingList))
-	for index := range res.GreetingList {
+	item := make([]*protos.GetGreetingListReply_List, len(res.Items))
+	for index := range res.Items {
 		item[index] = &protos.GetGreetingListReply_List{}
 	}
 	out = &protos.GetGreetingListReply{
@@ -37,8 +37,8 @@ func (r *GreetingServer) GetAll(ctx context.Context, in *protos.GetGreetingAllPa
 		log.Printf("err:%+v", err)
 		return
 	}
-	item := make([]*protos.GetGreetingAllReply_List, len(res.GreetingList))
-	for index := range res.GreetingList {
+	item := make([]*protos.GetGreetingAllReply_List, len(res))
+	for index := range res {
 		item[index] = &protos.GetGreetingAllReply_List{}
 	}
 	out = &protos.GetGreetingAllReply{

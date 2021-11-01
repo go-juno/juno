@@ -9,8 +9,8 @@ import (
 	"github.com/go-juno/juno/example/juno/api/grpc"
 	sv "github.com/go-juno/juno/example/juno/api/grpc/service"
 	"github.com/go-juno/juno/example/juno/api/http"
-	"github.com/go-juno/juno/example/juno/internal/database"
 	"github.com/go-juno/juno/example/juno/internal/endpoint"
+	"github.com/go-juno/juno/example/juno/internal/repo"
 	"github.com/go-juno/juno/example/juno/internal/service"
 	"github.com/google/wire"
 	http2 "net/http"
@@ -34,7 +34,7 @@ func NewServer(http *http2.Server,
 // initApp init endpoints
 func InitServer() (*Server, error) {
 	panic(wire.Build(
-		database.NewMysqlDB,
+		repo.ProviderSet,
 		service.ProviderSet,
 		endpoint.ProviderSet,
 		sv.ProviderSet,

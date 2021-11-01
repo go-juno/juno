@@ -5,7 +5,6 @@ import (
 
 	"juno/internal/model"
 	model2 "juno/pkg/model"
-
 	"golang.org/x/xerrors"
 )
 
@@ -14,16 +13,20 @@ type GetGreetingListRequest struct {
 	PageSize  int
 }
 
+type GetGreetingList struct {
+	Id uint
+}
+
 type GetGreetingListResponse struct {
-	GreetingList []*model.Greeting
-	Total        int64
+	Items []*GetGreetingList
+	Total int64
 }
 
 type GetGreetingAllRequest struct {
 }
 
 type GetGreetingAllResponse struct {
-	GreetingList []*model.Greeting
+	Id uint
 }
 
 type GetGreetingDetailRequest struct {
@@ -31,7 +34,7 @@ type GetGreetingDetailRequest struct {
 }
 
 type GetGreetingDetailResponse struct {
-	Greeting *model.Greeting
+	Id uint
 }
 
 type CreateGreetingRequest struct {
@@ -60,22 +63,33 @@ func (e *Endpoints) GetGreetingListEndpoint(ctx context.Context, request *GetGre
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	items := make([]*GetGreetingList, len(greetingList))
+	for index, item := range greetingList {
+		items[index] = &GetGreetingList{
+			Id: item.Id,
+		}
+
+	}
 	response = &GetGreetingListResponse{
-		GreetingList: greetingList,
-		Total:        total,
+		Items: items,
+		Total: total,
 	}
 	return
 }
 
-func (e *Endpoints) GetGreetingAllEndpoint(ctx context.Context, request *GetGreetingAllRequest) (response *GetGreetingAllResponse, err error) {
+func (e *Endpoints) GetGreetingAllEndpoint(ctx context.Context, request *GetGreetingAllRequest) (response []*GetGreetingAllResponse, err error) {
 	greetingList, err := e.greeting.GetAll()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	response = &GetGreetingAllResponse{
-		GreetingList: greetingList,
+	response = make([]*GetGreetingAllResponse, len(greetingList))
+	for index, greeting := range greetingList {
+		response[index] = &GetGreetingAllResponse{
+			Id: greeting.Id,
+		}
 	}
+
 	return
 }
 
@@ -85,9 +99,12 @@ func (e *Endpoints) GetGreetingDetailEndpoint(ctx context.Context, request *GetG
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	response = &GetGreetingDetailResponse{
-		Greeting: greeting,
+	if greeting != nil {
+		response = &GetGreetingDetailResponse{
+			Id: greeting.Id,
+		}
 	}
+
 	return
 }
 

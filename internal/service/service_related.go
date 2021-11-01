@@ -27,7 +27,9 @@ type serviceRelatedService struct {
 func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
 
 	camel, class, snake, hyphen := util.TransformName(name)
-	fileName := filepath.Join(constant.ServiceDirPath, fmt.Sprintf("%s.go", snake))
+	serviceDirPath := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
+
+	fileName := filepath.Join(serviceDirPath, fmt.Sprintf("%s.go", snake))
 
 	var ok bool
 	ok, err = util.IsExistsFile(fileName)
@@ -39,7 +41,7 @@ func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
 		err = errors.New("File already exists")
 		return
 	}
-	err = util.Mkdir(constant.ServiceDirPath)
+	err = util.Mkdir(serviceDirPath)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -58,7 +60,8 @@ func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
 func (s *serviceRelatedService) WireService(name string) (err error) {
 	_, class, _, _ := util.TransformName(name)
 	// wire add service
-	serviceFilePath := filepath.Join(constant.ServiceDirPath, "service.go")
+	serviceDirPath := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
+	serviceFilePath := filepath.Join(serviceDirPath, "service.go")
 	var content string = `
 		package service
 		import "github.com/google/wire"

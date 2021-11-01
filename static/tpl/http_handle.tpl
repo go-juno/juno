@@ -10,7 +10,7 @@ import (
 )
 
 func GreetingBluePrint(v1 *gin.RouterGroup, endpoints *endpoint.Endpoints) {
-	r := v1.Group("/greeting-router")
+	r := v1.Group("/greeting")
 	r.GET("list", getGreetingList(endpoints))
 	r.GET("all", getGreetingAll(endpoints))
 	r.GET("", getGreetingDetail(endpoints))
@@ -20,7 +20,7 @@ func GreetingBluePrint(v1 *gin.RouterGroup, endpoints *endpoint.Endpoints) {
 }
 
 /**
-@api {GET} /api/greeting-router/list 获取greeting列表
+@api {GET} /greeting/list 获取greeting列表
 @apiVersion 1.0.0
 @apiName getGreetingList
 @apiGroup greeting
@@ -58,7 +58,7 @@ func getGreetingList(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {GET} /api/greeting-router/all 获取全部greeting数据
+@api {GET} /greeting/all 获取全部greeting数据
 @apiVersion 1.0.0
 @apiName getGreetingAll
 @apiGroup greeting
@@ -94,7 +94,7 @@ func getGreetingAll(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {GET} /api/greeting-router/detail 获取greeting详情
+@api {GET} /greeting/detail 获取greeting详情
 @apiVersion 1.0.0
 @apiName getGreetingDetail
 @apiGroup greeting
@@ -130,7 +130,7 @@ func getGreetingDetail(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {POST} /api/greeting-router 创建greeting
+@api {POST} /greeting 创建greeting
 @apiVersion 1.0.0
 @apiName createGreeting
 @apiGroup greeting
@@ -163,7 +163,7 @@ func createGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {PUT} /api/greeting-router 更新greeting
+@api {PUT} /greeting 更新greeting
 @apiVersion 1.0.0
 @apiName updateGreeting
 @apiGroup greeting
@@ -197,7 +197,7 @@ func updateGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {DELETE} /api/greeting-router 删除greeting
+@api {DELETE} /greeting 删除greeting
 @apiVersion 1.0.0
 @apiName deleteGreeting
 @apiGroup greeting

@@ -1,14 +1,12 @@
 package handle
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/go-juno/juno/example/juno/api/http/schema"
 	"github.com/go-juno/juno/example/juno/api/http/serialize"
+	"github.com/go-juno/juno/example/juno/internal/endpoint"
 	"github.com/go-juno/juno/example/juno/pkg/res"
 	"golang.org/x/xerrors"
-
-	"github.com/go-juno/juno/example/juno/internal/endpoint"
-
-	"github.com/gin-gonic/gin"
 )
 
 func GreetingBluePrint(v1 *gin.RouterGroup, endpoints *endpoint.Endpoints) {
@@ -22,7 +20,7 @@ func GreetingBluePrint(v1 *gin.RouterGroup, endpoints *endpoint.Endpoints) {
 }
 
 /**
-@api {GET} /api/greeting/list 获取greeting列表
+@api {GET} /greeting/list 获取greeting列表
 @apiVersion 1.0.0
 @apiName getGreetingList
 @apiGroup greeting
@@ -60,7 +58,7 @@ func getGreetingList(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {GET} /api/greeting/all 获取全部greeting数据
+@api {GET} /greeting/all 获取全部greeting数据
 @apiVersion 1.0.0
 @apiName getGreetingAll
 @apiGroup greeting
@@ -96,7 +94,7 @@ func getGreetingAll(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {GET} /api/greeting 获取greeting详情
+@api {GET} /greeting/detail 获取greeting详情
 @apiVersion 1.0.0
 @apiName getGreetingDetail
 @apiGroup greeting
@@ -132,7 +130,7 @@ func getGreetingDetail(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {POST} /api/greeting 创建greeting
+@api {POST} /greeting 创建greeting
 @apiVersion 1.0.0
 @apiName createGreeting
 @apiGroup greeting
@@ -165,7 +163,7 @@ func createGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {PUT} /api/greeting 更新greeting
+@api {PUT} /greeting 更新greeting
 @apiVersion 1.0.0
 @apiName updateGreeting
 @apiGroup greeting
@@ -199,7 +197,7 @@ func updateGreeting(endpoints *endpoint.Endpoints) gin.HandlerFunc {
 }
 
 /**
-@api {DELETE} /api/greeting 删除greeting
+@api {DELETE} /greeting 删除greeting
 @apiVersion 1.0.0
 @apiName deleteGreeting
 @apiGroup greeting

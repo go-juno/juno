@@ -27,6 +27,7 @@ func IsExitsDir(dir string) (ok bool, err error) {
 }
 
 func IsExistsFile(path string) (ok bool, err error) {
+
 	_, err = os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
 		if !os.IsExist(err) {
@@ -248,7 +249,8 @@ func CreateMod(root string) (err error) {
 }
 
 func FmtCode() (err error) {
-	cmd := exec.Command("gofmt", "-w", ".")
+
+	cmd := exec.Command("gofmt", "-w", GetPwd())
 	err = cmd.Run()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -270,7 +272,9 @@ func GenProto(name string) (err error) {
 }
 
 func GetApiPrefix() (apiPrefix string, err error) {
-	file, err := os.Open("api/http/http.go")
+
+	httpFile := filepath.Join(GetPwd(), constant.HttpDirPath, "http.go")
+	file, err := os.Open(httpFile)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
