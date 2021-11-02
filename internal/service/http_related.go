@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/util"
-	"github.com/go-juno/juno/static"
 	"golang.org/x/xerrors"
 )
 
@@ -165,6 +164,125 @@ import (
 
 }
 
+func genHandleFile(mod, apiPrefix, fileCamel, fileHyphen, fileClass, content string, methodList []*Method) (fileContent string) {
+
+	if content == "" {
+		fileContent = fmt.Sprintf(`package handle
+import (
+		"%s/api/http/schema"
+		"%s/api/http/serialize"
+		"%s/internal/endpoint"
+		"%s/pkg/res"
+	
+		"github.com/gin-gonic/gin"
+		"golang.org/x/xerrors"
+)	
+`, mod, mod, mod, mod)
+
+	} else {
+		fileContent = content
+	}
+
+	var bluePrintString, methodString string
+
+	for _, method := range methodList {
+		camel, class, _, _ := util.TransformName(method.Name)
+		if strings.Contains(fileContent, fmt.Sprintf("%s(endpoints)", camel)) {
+			continue
+		}
+		if bluePrintString != "" {
+			bluePrintString += "\n"
+		}
+		bluePrintString += fmt.Sprintf(`r.%s("", %s(endpoints))`, util.GetMethod(camel), camel)
+		var requestString, responseString, successResponseString string
+		for _, field := range method.Request.FiledList {
+			if requestString != "" {
+				requestString += "\n"
+			}
+			_, _, s, _ := util.TransformName(field.Name)
+			requestString += fmt.Sprintf("@apiParam {%s} %s %s", field.Type, s, s)
+
+		}
+		for _, field := range method.Response.FiledList {
+			if responseString != "" {
+				responseString += "\n"
+			}
+
+			_, _, s, _ := util.TransformName(field.Name)
+			responseString += fmt.Sprintf("@apiSuccess {%s} %s %s", field.Type, s, s)
+			var value string
+			if strings.Contains(field.Type, "int") {
+				value = "1"
+			} else {
+				value = fmt.Sprintf(`"%s"`, field.Name)
+			}
+			if successResponseString != "" {
+				successResponseString += ","
+			}
+			successResponseString += fmt.Sprintf(`"%s":%s`, s, value)
+		}
+		if method.Response.Pagination {
+			successResponseString = fmt.Sprintf(`{"status":"success","msg":null,"data":{"items":[{%s}],"total":10}}`, successResponseString)
+		} else if method.Response.IsList {
+			successResponseString = fmt.Sprintf(`{"status":"success","msg":null,"data":[{%s}]}`, successResponseString)
+		} else {
+			successResponseString = fmt.Sprintf(`{"status":"success","msg":null,"data":{%s}}`, successResponseString)
+		}
+		methodString += fmt.Sprintf(`/**
+@api {%s} /api%s/%s %s
+@apiVersion 1.0.0
+@apiName %s
+@apiGroup %s
+%s
+@apiSuccess {string} status 状态码
+@apiSuccess {string} msg 返回的信息
+@apiSuccess {list} data 返回的数据
+%s
+@apiSuccessExample Success-Response:
+%s
+@apiErrorExample Error-Response:
+{"status": "failure", "data": null, "message": "失败"}
+**/
+func %s(endpoints *endpoint.Endpoints) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var schema schema.%s
+		err := c.ShouldBind(&schema)
+		if err != nil {
+			err = xerrors.Errorf("%%w", err)
+			res.ParamCheckRes(c, err)
+			return
+		}
+		req := schema.Transform()
+		result, err := endpoints.%sEndpoint(c, req)
+		if err != nil {
+			err = xerrors.Errorf("%%w", err)
+			res.FailureRes(c, err)
+			return
+		}
+		res.SuccessRes(c, serialize.%sTransform(result))
+	}
+}
+`, util.GetMethod(camel), apiPrefix, fileHyphen, camel, camel, fileCamel, requestString, responseString, successResponseString, camel, class, class, class)
+
+	}
+
+	if bluePrintString != "" {
+		fileContent = fmt.Sprintf(`%s
+		func %sBluePrint(v1 *gin.RouterGroup, endpoints *endpoint.Endpoints) {
+			r := v1.Group("/%s")
+			%s
+		}
+		`, fileContent, fileClass, fileHyphen, bluePrintString)
+	}
+	if methodString != "" {
+		fileContent = fmt.Sprintf(`%s
+%s
+		`, fileContent, methodString)
+	}
+
+	return
+}
+
 func (s *httpRelatedService) CreateSchema(mod, name string, methodList []*Method) (err error) {
 
 	_, _, snake, _ := util.TransformName(name)
@@ -252,10 +370,23 @@ func (s *httpRelatedService) CreateHandle(mod, name string, methodList []*Method
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	var tpl, content string
 	if ok {
-		// TODO 根据更新endpoint 更新service
+		var contentByte []byte
+		contentByte, err = util.ReadAll(handleFileName)
+		if err != nil {
+			err = xerrors.Errorf("%w", err)
+			return
+		}
+		content = string(contentByte)
+	}
+	var apiPrefix string
+	apiPrefix, err = util.GetApiPrefix()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
 		return
 	}
+	tpl = genHandleFile(mod, apiPrefix, camel, hyphen, class, content, methodList)
 
 	err = util.Mkdir(httpHandleDirPath)
 	if err != nil {
@@ -263,15 +394,7 @@ func (s *httpRelatedService) CreateHandle(mod, name string, methodList []*Method
 		return
 	}
 
-	var apiPrefix string
-	apiPrefix, err = util.GetApiPrefix()
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
-
-	// 替换 模块
-	tpl := util.ReplaceHttp(static.HttpHandleTpl, mod, camel, class, snake, hyphen, apiPrefix)
+	// 写入文件
 	err = util.WriteToFile(handleFileName, tpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)

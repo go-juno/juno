@@ -64,3 +64,18 @@ func GetPwd() (dir string) {
 	dir, _ = os.Getwd()
 	return
 }
+
+func GetMethod(name string) (method string) {
+	method = "POST"
+	if strings.HasPrefix(name, "get") {
+		method = "GET"
+	} else if strings.HasPrefix(name, "create") {
+		method = "POST"
+	} else if strings.HasPrefix(name, "update") {
+		method = "PUT"
+	} else if strings.HasPrefix(name, "delete") || strings.HasPrefix(name, "cancel") {
+		method = "DELETE"
+	}
+	return
+
+}

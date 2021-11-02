@@ -107,7 +107,9 @@ func (s *serviceRelatedService) WireService(name string) (err error) {
 }
 
 func (s *serviceRelatedService) RunWire() (err error) {
-	cmd := exec.Command("wire", "./cmd/wire.go")
+
+	wirePath := filepath.Join(util.GetPwd(), "cmd/wire.go")
+	cmd := exec.Command("wire", wirePath)
 	err = cmd.Run()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)

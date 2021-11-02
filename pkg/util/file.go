@@ -251,11 +251,7 @@ func CreateMod(root string) (err error) {
 func FmtCode() (err error) {
 
 	cmd := exec.Command("gofmt", "-w", GetPwd())
-	err = cmd.Run()
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
+	_ = cmd.Run()
 	return
 }
 
