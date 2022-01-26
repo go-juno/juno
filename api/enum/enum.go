@@ -133,6 +133,7 @@ func (g *Generator) parsePackage(patterns []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	if len(pkgs) != 1 {
 		log.Fatalf("error: %d packages found", len(pkgs))
 	}
