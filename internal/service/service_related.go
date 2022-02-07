@@ -1,11 +1,9 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -15,22 +13,10 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type ServiceRelatedService interface {
-	CreateService(mod, name string) (err error)
-	WireService(name string) (err error)
-	RunWire() (err error)
-}
-
-type serviceRelatedService struct {
-}
-
-func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
-
+func GeneratorService(mod, name string) (err error) {
 	camel, class, snake, hyphen := util.TransformName(name)
 	serviceDirPath := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
-
 	fileName := filepath.Join(serviceDirPath, fmt.Sprintf("%s.go", snake))
-
 	var ok bool
 	ok, err = util.IsExistsFile(fileName)
 	if err != nil {
@@ -38,7 +24,7 @@ func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
 		return
 	}
 	if ok {
-		err = errors.New("File already exists")
+		err = xerrors.Errorf("file:%s already exists", fileName)
 		return
 	}
 	err = util.Mkdir(serviceDirPath)
@@ -57,7 +43,7 @@ func (s *serviceRelatedService) CreateService(mod, name string) (err error) {
 	return
 }
 
-func (s *serviceRelatedService) WireService(name string) (err error) {
+func WireService(name string) (err error) {
 	_, class, _, _ := util.TransformName(name)
 	// wire add service
 	serviceDirPath := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
@@ -104,20 +90,4 @@ func (s *serviceRelatedService) WireService(name string) (err error) {
 		return
 	}
 	return
-}
-
-func (s *serviceRelatedService) RunWire() (err error) {
-
-	wirePath := filepath.Join(util.GetPwd(), "cmd/wire.go")
-	cmd := exec.Command("wire", wirePath)
-	err = cmd.Run()
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
-	return
-}
-
-func NewServiceRelatedService() ServiceRelatedService {
-	return &serviceRelatedService{}
 }

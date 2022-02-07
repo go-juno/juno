@@ -6,7 +6,6 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -245,25 +244,6 @@ func CreateMod(root string) (err error) {
 	if err = WriteToFile(path, str); err != nil {
 		return
 	}
-	return
-}
-
-func FmtCode() (err error) {
-
-	cmd := exec.Command("gofmt", "-w", GetPwd())
-	_ = cmd.Run()
-	return
-}
-
-func GenProto(name string) (err error) {
-
-	cmd := exec.Command("protoc", "--go_out=paths=source_relative:.", "--go-grpc_out=paths=source_relative:.", "--go-grpc_opt=require_unimplemented_servers=false", fmt.Sprintf("api/grpc/protos/%s.proto", name))
-	err = cmd.Run()
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
-
 	return
 }
 

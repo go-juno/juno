@@ -1,5 +1,3 @@
-# github.com/go-juno/juno/example/juno
-
 ## Table of Contents
 
 - [Requirements](#requirements)
@@ -9,7 +7,7 @@
 
 requires the following to run:
 
-- go ^1.16
+- go ^1.17
 
 ## Usage
 
@@ -21,12 +19,6 @@ requires the following to run:
 
 ```
     protoc --go_out=paths=source_relative:.  --go-grpc_out=paths=source_relative:. --go-grpc_opt=require_unimplemented_servers=false api/grpc/protos/*.proto
-```
-
-## apidoc
-
-```
-   apidoc -i ./api  -o ./static/api-doc  -c ./docs --single
 ```
 
 ## wire

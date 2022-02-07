@@ -1,8 +1,0 @@
-{
-  "name": "github.com/go-juno/juno/example/juno-http-grpc-skeleton",
-  "version": "1.0.0",
-  "description": "github.com/go-juno/juno/example/juno-http-grpc-skeleton文档",
-  "title": "github.com/go-juno/juno/example/juno-http-grpc-skeleton",
-  "url": "http://127.0.0.1:8080",
-  "header": { "title": "header", "filename": "./docs/header.md" }
-}

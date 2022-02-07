@@ -7,8 +7,6 @@ package cmd
 
 import (
 	"github.com/go-juno/juno/api/command"
-	"github.com/go-juno/juno/internal/endpoint"
-	"github.com/go-juno/juno/internal/service"
 	"github.com/go-juno/juno/pkg/cli"
 )
 
@@ -16,15 +14,6 @@ import (
 
 // initApp init endpoints
 func InitServer() ([]*cli.Command, error) {
-	baseEnvService := service.NewBaseEnvService()
-	modService := service.NewModService()
-	projectRelatedService := service.NewProjectRelatedService()
-	serviceRelatedService := service.NewServiceRelatedService()
-	endpointRelatedService := service.NewEndpointRelatedService()
-	httpRelatedService := service.NewHttpRelatedService()
-	grpcRelatedService := service.NewGrpcRelatedService()
-	parseService := service.NewParseService()
-	endpoints := endpoint.NewEndpoints(baseEnvService, modService, projectRelatedService, serviceRelatedService, endpointRelatedService, httpRelatedService, grpcRelatedService, parseService)
-	v := command.GenCommandList(endpoints)
+	v := command.GenCommandList()
 	return v, nil
 }

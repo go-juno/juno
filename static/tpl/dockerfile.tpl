@@ -10,5 +10,6 @@ COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 WORKDIR /source
 RUN echo "Asia/Shanghai" > /etc/timezone
+COPY ./configs/config.yaml ./configs/config.yaml
 COPY --from=builder /source/start ./
 CMD ./start

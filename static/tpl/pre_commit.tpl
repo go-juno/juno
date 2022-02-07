@@ -8,4 +8,3 @@ repos:
       - id: golangci-lint
       - id: go-build
       - id: go-mod-tidy
-      - id: api-doc
