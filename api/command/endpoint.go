@@ -29,7 +29,7 @@ func (t *CreateEndpointCommand) Main() {
 func NewCreateEndpointCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "endpoint",
-		Short: "\tCreate a endpoint\n",
+		Short: "Create a endpoint\n",
 		RunI:  &CreateEndpointCommand{},
 	}
 }

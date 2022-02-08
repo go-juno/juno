@@ -31,7 +31,7 @@ func (t *CreateServiceCommand) Main() {
 func NewCreateServiceCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "service",
-		Short: "\tCreate a service\n",
+		Short: "Create a service\n",
 		RunI:  &CreateServiceCommand{},
 	}
 }
