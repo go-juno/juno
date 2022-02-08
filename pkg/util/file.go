@@ -66,22 +66,6 @@ func TransformName(name string) (camel, class, snake, hyphen string) {
 
 }
 
-func Replace(content, mod, camel, class, snake, hyphen string) (tpl string) {
-	tpl = strings.ReplaceAll(content, constant.TplHyphen, hyphen)
-	tpl = strings.ReplaceAll(tpl, constant.TplMod, mod)
-	tpl = strings.ReplaceAll(tpl, constant.TplCamel, camel)
-	tpl = strings.ReplaceAll(tpl, constant.TplClass, class)
-	tpl = strings.ReplaceAll(tpl, constant.TplSnake, snake)
-	return
-}
-
-func ReplaceHttp(content, mod, camel, class, snake, hyphen, apiPrefix string) (tpl string) {
-	tpl = strings.ReplaceAll(content, fmt.Sprintf("/api/%s", constant.TplHyphen), fmt.Sprintf("%s/%s", apiPrefix, constant.TplHyphen))
-	tpl = Replace(tpl, mod, camel, class, snake, hyphen)
-
-	return
-}
-
 func WriteToFile(fileName string, content string) (err error) {
 	var f *os.File
 	f, err = os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)

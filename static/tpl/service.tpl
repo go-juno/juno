@@ -29,7 +29,7 @@ func (s *{camel}Service) GetList(pageIndex int, pageSize int) ({camel}List []*mo
 		Find(&{camel}List).Error
 
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		err = xerrors.Errorf("%%w", err)
 		return
 	}
 	return
@@ -40,7 +40,7 @@ func (s *{camel}Service) GetAll() ({camel}List []*model.{class}, err error) {
 		Order("created_at desc,id desc").
 		Find(&{camel}List).Error
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		err = xerrors.Errorf("%%w", err)
 		return
 	}
 	return
@@ -49,7 +49,7 @@ func (s *{camel}Service) GetAll() ({camel}List []*model.{class}, err error) {
 func (s *{camel}Service) GetDetail(id uint) ({camel} *model.{class}, err error) {
 	err = s.db.Model(&model.{class}{}).Where("id = ?", id).Find(&{camel}).Error
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		err = xerrors.Errorf("%%w", err)
 		return
 	}
 	return
@@ -60,7 +60,7 @@ func (s *{camel}Service) Create({camel} *model.{class}) (err error) {
 		UpdateAll: true,
 	}).Create({camel}).Error
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		err = xerrors.Errorf("%%w", err)
 		return
 	}
 	return
@@ -70,7 +70,7 @@ func (s *{camel}Service) Update({camel} *model.{class}) (err error) {
 
 	err = s.db.Model(&model.{class}{}).Where("id = ?", {camel}.Id).Updates({camel}).Error
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		err = xerrors.Errorf("%%w", err)
 		return
 	}
 	return
@@ -79,7 +79,7 @@ func (s *{camel}Service) Update({camel} *model.{class}) (err error) {
 func (s *{camel}Service) Delete(id uint) (err error) {
 	err = s.db.Where("id = ?", id).Delete(&model.{class}{}).Error
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		err = xerrors.Errorf("%%w", err)
 		return
 	}
 	return
