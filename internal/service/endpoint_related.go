@@ -35,7 +35,7 @@ func WireEndpoint(mod, name string) (err error) {
 	}
 	structString := fmt.Sprintf("type Endpoints struct {\n\t%s service.%sService", camel, class)
 	paramString := fmt.Sprintf("func NewEndpoints(\n\t%s service.%sService,", camel, class)
-	classString := fmt.Sprintf("return &Endpoints{%s:\n\t\t%s,", camel, camel)
+	classString := fmt.Sprintf("return &Endpoints{\n\t\t%s: %s,", camel, camel)
 	g.Replace("type Endpoints struct {", structString)
 	g.Replace("func NewEndpoints(", paramString)
 	g.Replace("return &Endpoints{", classString)

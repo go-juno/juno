@@ -15,8 +15,8 @@ import (
 	"golang.org/x/xerrors"
 )
 
-func IsExitsDir(dir string) (ok bool, err error) {
-	if _, err = os.Stat(dir); err != nil {
+func IsExitsDir(dir string) (ok bool) {
+	if _, err := os.Stat(dir); err != nil {
 		if !os.IsNotExist(err) {
 			ok = true
 			return
@@ -43,13 +43,8 @@ func IsExistsFile(path string) (ok bool, err error) {
 }
 
 func Mkdir(dir string) (err error) {
-	var ok bool
-	ok, err = IsExitsDir(dir)
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
-	if ok {
+	ok := IsExitsDir(dir)
+	if !ok {
 		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
 			return err
 		}

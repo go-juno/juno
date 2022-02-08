@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"go/format"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -43,7 +42,6 @@ func NewGenerator(name, path, mod string) (g *Generator, err error) {
 			err = xerrors.Errorf("%w", err)
 			return
 		}
-		log.Println("filePath", string(filePath))
 		g.buf = *bytes.NewBuffer(content)
 	}
 	return
@@ -99,12 +97,12 @@ func (g *Generator) WriteToFile() (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	// //先创建文件夹
-	// err = util.Mkdir(g.path)
-	// if err != nil {
-	// 	err = xerrors.Errorf("%w", err)
-	// 	return
-	// }
+	//先创建文件夹
+	err = util.Mkdir(g.path)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
 	err = ioutil.WriteFile(g.filePath, src, 0644)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
