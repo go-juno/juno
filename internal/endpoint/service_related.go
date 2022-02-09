@@ -3,6 +3,7 @@ package endpoint
 import (
 	"github.com/go-juno/juno/internal/service"
 	"github.com/go-juno/juno/pkg/command"
+	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/xerrors"
 )
 
@@ -12,7 +13,7 @@ type CreateServiceRequest struct {
 
 func CreateServiceEndpoint(request *CreateServiceRequest) (err error) {
 	//  获取mod
-	mod, err := service.GetMod()
+	mod, err := util.GetMod()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

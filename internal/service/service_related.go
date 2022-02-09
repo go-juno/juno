@@ -53,3 +53,13 @@ func WireService(mod, name string) (err error) {
 	}
 	return
 }
+
+type ServiceParse struct {
+	Request  []*Filed
+	Response []*Filed
+	Package  []*Package
+}
+
+// func ParseService() (err error) {
+
+// }

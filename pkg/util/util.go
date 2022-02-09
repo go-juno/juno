@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/tools/go/packages"
 	"golang.org/x/xerrors"
 )
 
@@ -62,6 +63,20 @@ func CamelString(s string) string {
 
 func GetPwd() (dir string) {
 	dir, _ = os.Getwd()
+	return
+}
+
+func GetMod() (mod string, err error) {
+	cfg := &packages.Config{
+		Mode:  packages.NeedFiles,
+		Tests: false,
+	}
+	pkgs, err := packages.Load(cfg)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	mod = pkgs[0].String()
 	return
 }
 
