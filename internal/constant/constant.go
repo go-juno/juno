@@ -14,4 +14,6 @@ var (
 	HttpDirPath     = "api/http"
 	GrpcDirPath     = "api/grpc"
 	WireFilePath    = "cmd/wire.go"
+	ContantPath     = "internal/contant"
+	ModelPath       = "internal/model"
 )

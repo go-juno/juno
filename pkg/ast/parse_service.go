@@ -8,7 +8,10 @@ import (
 	"log"
 	"path/filepath"
 
+	"github.com/go-juno/juno/internal/constant"
+	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/tools/go/packages"
+	"golang.org/x/xerrors"
 )
 
 func parsePackage() {
@@ -111,7 +114,7 @@ type Field struct {
 	Name       string
 	TypeString string
 	FieldType  FieldType
-	Field      []*Field
+	Fields     []*Field
 }
 
 type Func struct {
@@ -125,11 +128,65 @@ type Parser struct {
 	Packages []string
 }
 
-func (f *Field) ParseFeild(expr ast.Expr) {
+type Pkg struct {
+	Files []*ast.File
+}
+
+func NewPkg(dirs []string) (pkg *Pkg, err error) {
+	pkg = &Pkg{
+		Files: []*ast.File{},
+	}
+	for _, dir := range dirs {
+		cfg := &packages.Config{
+			Mode:  packages.NeedSyntax,
+			Tests: false,
+			Dir:   dir,
+		}
+		var pkgs []*packages.Package
+		pkgs, err = packages.Load(cfg)
+		if err != nil {
+			err = xerrors.Errorf("%w", err)
+			return
+		}
+		pkg.Files = append(pkg.Files, pkgs[0].Syntax...)
+	}
+	return
+}
+
+func (pkg *Pkg) ParseFeildOfStruct(structName string) (feildList []*Field) {
+	feildList = make([]*Field, 0)
+	for _, f := range pkg.Files {
+		for _, decl := range f.Decls {
+			genDecl, ok := decl.(*ast.GenDecl)
+			if ok {
+				if genDecl.Tok == token.TYPE {
+					for _, spec := range genDecl.Specs {
+						typespec, ok := spec.(*ast.TypeSpec)
+						if ok {
+							if typespec.Name.Name == structName {
+								structType, ok := typespec.Type.(*ast.StructType)
+								if ok {
+									for _, f := range structType.Fields.List {
+										feildList = append(feildList, pkg.ParseFeild(f))
+									}
+								}
+								return
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return
+}
+
+func (f *Field) ParseFeildType(expr ast.Expr, p *Pkg) {
 	switch v := expr.(type) {
 	case *ast.StarExpr:
 		f.TypeString = fmt.Sprintf("%s*", f.TypeString)
-		f.ParseFeild(v.X)
+		f.ParseFeildType(v.X, p)
 	case *ast.SelectorExpr:
 		var prefix string
 		ident, ok := v.X.(*ast.Ident)
@@ -138,6 +195,7 @@ func (f *Field) ParseFeild(expr ast.Expr) {
 		}
 		f.TypeString = fmt.Sprintf("%s%s.%s", f.TypeString, prefix, v.Sel.Name)
 		f.FieldType = FieldTypeStruct
+		f.Fields = p.ParseFeildOfStruct(v.Sel.Name)
 	case *ast.Ident:
 		if v.Obj != nil {
 			f.FieldType = FieldTypeStruct
@@ -145,24 +203,36 @@ func (f *Field) ParseFeild(expr ast.Expr) {
 			f.FieldType = FieldTypeCommon
 		}
 		f.TypeString = fmt.Sprintf("%s%s", f.TypeString, v.Name)
+		f.Fields = p.ParseFeildOfStruct(v.Name)
 	case *ast.ArrayType:
 		f.TypeString = fmt.Sprintf("%s[]", f.TypeString)
-		f.ParseFeild(v.Elt)
+		f.ParseFeildType(v.Elt, p)
 	}
 }
 
-func ParseFile(path, name string) (p *Parser) {
+func (pkg *Pkg) ParseFeild(af *ast.Field) (f *Field) {
+	if len(af.Names) == 0 {
+		return
+	}
+	f = &Field{
+		Name:       af.Names[0].Name,
+		TypeString: "",
+		FieldType:  FieldTypeCommon,
+		Fields:     []*Field{},
+	}
+	f.ParseFeildType(af.Type, pkg)
+	return f
+}
 
+func ParseFile(path, name string) (p *Parser, err error) {
 	p = &Parser{}
 	fset := token.NewFileSet()
 	filename := filepath.Join(path, fmt.Sprintf("%s.go", name))
 	f, err := parser.ParseFile(fset, filename, nil, parser.AllErrors)
 	if err != nil {
-		log.Println(err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
-	ast.Print(fset, f)
-
 	for _, decl := range f.Decls {
 		genDecl, ok := decl.(*ast.GenDecl)
 		if ok {
@@ -173,6 +243,13 @@ func ParseFile(path, name string) (p *Parser) {
 						interfaceType, ok := typespec.Type.(*ast.InterfaceType)
 						if ok {
 
+							modelPath := filepath.Join(util.GetPwd(), constant.ModelPath)
+							var pkg *Pkg
+							pkg, err = NewPkg([]string{modelPath, path})
+							if err != nil {
+								err = xerrors.Errorf("%w", err)
+								return
+							}
 							// 遍历接口
 							for _, method := range interfaceType.Methods.List {
 								funcs := &Func{
@@ -183,23 +260,22 @@ func ParseFile(path, name string) (p *Parser) {
 									// 遍历函数参数
 									request := make([]*Field, 0)
 									for _, param := range funcType.Params.List {
-										field := &Field{
-											Name:       param.Names[0].Name,
-											TypeString: "",
+										feild := pkg.ParseFeild(param)
+										if feild != nil {
+											request = append(request, pkg.ParseFeild(param))
 										}
-										field.ParseFeild(param.Type)
-										request = append(request, field)
+
 									}
 									funcs.Request = request
 									// 遍历函数返回值
 									response := make([]*Field, 0)
 									for _, result := range funcType.Results.List {
-										field := &Field{
-											Name:       result.Names[0].Name,
-											TypeString: "",
+										response = append(response, pkg.ParseFeild(result))
+
+										feild := pkg.ParseFeild(result)
+										if feild != nil {
+											response = append(response, pkg.ParseFeild(result))
 										}
-										field.ParseFeild(result.Type)
-										response = append(response, field)
 									}
 									funcs.Response = response
 								}
@@ -232,18 +308,34 @@ func ParseFile(path, name string) (p *Parser) {
 	return
 }
 
+func (f *Field) Log() {
+	if f == nil {
+		return
+	}
+	fmt.Printf("%s %s %s\n", f.Name, f.TypeString, f.FieldType)
+	if f.Fields != nil {
+		for _, field := range f.Fields {
+			field.Log()
+		}
+	}
+
+}
+
 func main() {
 	path := "/Users/dz0400145/my/kit-service/internal/service"
 	name := "earning_summary"
-	p := ParseFile(path, name)
+	p, err := ParseFile(path, name)
+	if err != nil {
+		log.Printf("err:%+v", err)
+	}
 	log.Println("package:", p.Packages)
 	for _, fu := range p.Funcs {
 		log.Println(fu.Name)
 		for _, req := range fu.Request {
-			log.Println("request:", req.Name, req.TypeString, req.FieldType)
+			req.Log()
 		}
-		for _, req := range fu.Response {
-			log.Println("response:", req.Name, req.TypeString, req.FieldType)
+		for _, res := range fu.Response {
+			res.Log()
 		}
 	}
 }
