@@ -5,7 +5,7 @@
 ### Go ###
 # Binaries for programs and plugins
 *.exe
-*.exe~
+*.exe$HOME
 *.dll
 *.so
 *.dylib

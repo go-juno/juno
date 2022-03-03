@@ -63,7 +63,7 @@ func CamelString(s string) string {
 func GetPwd() (dir string) {
 	// dir, _ = os.Getwd()
 	// return
-	dir = "/Users/dz0400145/my/kit-service"
+	dir = "/Users/admin/my/kit-service"
 	return
 }
 

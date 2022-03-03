@@ -1,11 +1,10 @@
-package main
+package ast
 
 import (
 	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"log"
 	"path/filepath"
 
 	"github.com/go-juno/juno/internal/constant"
@@ -13,95 +12,6 @@ import (
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/xerrors"
 )
-
-func parsePackage() {
-	cfg := &packages.Config{
-		Mode:  packages.NeedSyntax,
-		Tests: false,
-		Dir:   "/Users/dz0400145/my/kit-service/internal/service",
-	}
-	pkgs, err := packages.Load(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	// log.Println("pkgs[0]", pkgs)
-	// fset := token.NewFileSet()
-	// ast.Print(fset, pkgs[0].Syntax[1])
-	for _, file := range pkgs[0].Syntax {
-		log.Println("file", file.Name)
-	}
-}
-
-// func genDecl(node ast.Node) bool {
-// 	decl, ok := node.(*ast.GenDecl)
-// 	if !ok {
-// 		return true
-// 	}
-// 	for _, spec := range decl.Specs {
-// 		vspec := spec.(*ast.ValueSpec) // Guaranteed to succeed as this is CONST.
-// 		if vspec.Type == nil && len(vspec.Values) > 0 {
-// 			// "X = 1". With no type but a value. If the constant is untyped,
-// 			// skip this vspec and reset the remembered type.
-// 			typ = ""
-
-// 			// If this is a simple type conversion, remember the type.
-// 			// We don't mind if this is actually a call; a qualified call won't
-// 			// be matched (that will be SelectorExpr, not Ident), and only unusual
-// 			// situations will result in a function call that appears to be
-// 			// a type conversion.
-// 			ce, ok := vspec.Values[0].(*ast.CallExpr)
-// 			if !ok {
-// 				continue
-// 			}
-// 			id, ok := ce.Fun.(*ast.Ident)
-// 			if !ok {
-// 				continue
-// 			}
-// 			typ = id.Name
-// 		}
-// 		if vspec.Type != nil {
-// 			// "X T". We have a type. Remember it.
-// 			ident, ok := vspec.Type.(*ast.Ident)
-// 			if !ok {
-// 				continue
-// 			}
-// 			typ = ident.Name
-// 		}
-// 		if typ != f.typeName {
-// 			// This is not the type we're looking for.
-// 			continue
-// 		}
-// 		// We now have a list of names (from one line of source code) all being
-// 		// declared with the desired type.
-// 		// Grab their names and actual values and store them in f.values.
-// 		for _, name := range vspec.Names {
-// 			if name.Name == "_" {
-// 				continue
-// 			}
-// 			// This dance lets the type checker find the values for us. It's a
-// 			// bit tricky: look up the object declared by the name, find its
-// 			// types.Const, and extract its value.
-// 			obj, ok := f.pkg.defs[name]
-// 			if !ok {
-// 				log.Fatalf("no value for constant %s", name)
-// 			}
-// 			info := obj.Type().Underlying().(*types.Basic).Info()
-// 			if info&types.IsString == 0 {
-// 				log.Fatalf("can't handle non-string constant type %s", typ)
-// 			}
-// 			value := obj.(*types.Const).Val() // Guaranteed to succeed as this is CONST.
-// 			if value.Kind() != constant.String {
-// 				log.Fatalf("can't happen: constant is not an string %s", name)
-// 			}
-// 			v := Value{
-// 				originalName: name.Name,
-// 				value:        constant.StringVal(value),
-// 			}
-// 			f.values = append(f.values, v)
-// 		}
-// 	}
-// 	return false
-// }
 
 type FieldType string
 
@@ -151,6 +61,46 @@ func NewPkg(dirs []string) (pkg *Pkg, err error) {
 		pkg.Files = append(pkg.Files, pkgs[0].Syntax...)
 	}
 	return
+}
+
+func generateEndpointStrcut(prefix string, fields []*Field, fieldMap map[string]bool) (code string) {
+	for _, field := range fields {
+		if field.FieldType == FieldTypeStruct {
+			generateEndpointStrcut(field.Name, field.Fields, fieldMap)
+		} else {
+			name := field.Name
+			exits, _ := fieldMap[field.Name]
+			if exits {
+				name = fmt.Sprintf("%s%s", prefix, field.Name)
+			}
+			code += fmt.Sprintf("\t%s  %s\n", name, field.TypeString)
+			fieldMap[name] = true
+		}
+	}
+	return
+}
+
+func (f *Func) GenerateRequestStrcut() (code string) {
+	// 写入struct
+	requestMap := make(map[string]bool)
+	code = fmt.Sprintf("type %sRequest struct { \n", f.Name)
+	code += generateEndpointStrcut("", f.Request, requestMap)
+	return
+}
+func (f *Func) GenerateResponseStrcut() (code string) {
+	// 写入struct
+	m := make(map[string]bool)
+	code = fmt.Sprintf("type %sResponse struct { \n", f.Name)
+	code += generateEndpointStrcut("", f.Response, m)
+	return
+}
+
+func (f *Func) GenerateFunc() (code string) {
+	//TODO 写入func
+	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name, f.Name, f.Name)
+	code += fmt.Sprintf("")
+	return
+
 }
 
 func (pkg *Pkg) ParseFeildOfStruct(structName string) (feildList []*Field) {
@@ -319,23 +269,4 @@ func (f *Field) Log() {
 		}
 	}
 
-}
-
-func main() {
-	path := "/Users/dz0400145/my/kit-service/internal/service"
-	name := "earning_summary"
-	p, err := ParseFile(path, name)
-	if err != nil {
-		log.Printf("err:%+v", err)
-	}
-	log.Println("package:", p.Packages)
-	for _, fu := range p.Funcs {
-		log.Println(fu.Name)
-		for _, req := range fu.Request {
-			req.Log()
-		}
-		for _, res := range fu.Response {
-			res.Log()
-		}
-	}
 }

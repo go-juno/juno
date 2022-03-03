@@ -2,8 +2,10 @@ package service
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/go-juno/juno/internal/constant"
+	"github.com/go-juno/juno/pkg/ast"
 	"github.com/go-juno/juno/pkg/generator"
 	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/xerrors"
@@ -39,6 +41,41 @@ func WireEndpoint(mod, name string) (err error) {
 	g.Replace("type Endpoints struct {", structString)
 	g.Replace("func NewEndpoints(", paramString)
 	g.Replace("return &Endpoints{", classString)
+	err = g.WriteToFile()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	return
+}
+
+func GeneratorEndpoint(mod, name string) (err error) {
+	g, err := generator.NewGenerator(name, constant.EndpointDirPath, mod)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if g.IsExistsFile() {
+		err = xerrors.Errorf("endpoint:%s already exists", name)
+		return
+	}
+	path := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
+	p, err := ast.ParseFile(path, name)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	g.Printf("package endpoint\n")
+
+	//判断是否有package需要inport
+	if len(p.Packages) != 0 {
+		g.Printf("import (\n")
+		for _, packageName := range p.Packages {
+			g.Printf("%s\n", packageName)
+		}
+		g.Printf(")\n")
+	}
+
 	err = g.WriteToFile()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
