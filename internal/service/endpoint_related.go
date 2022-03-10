@@ -66,14 +66,19 @@ func GeneratorEndpoint(mod, name string) (err error) {
 		return
 	}
 	g.Printf("package endpoint\n")
-
+	g.Printf("\nimport (\n")
+	g.Printf("%s\n", "\"context\"")
 	//判断是否有package需要inport
 	if len(p.Packages) != 0 {
-		g.Printf("import (\n")
 		for _, packageName := range p.Packages {
 			g.Printf("%s\n", packageName)
 		}
-		g.Printf(")\n")
+	}
+	g.Printf(")\n")
+	for _, f := range p.Funcs {
+		g.Printf(f.GenerateRequestStrcut())
+		g.Printf(f.GenerateResponseStrcut())
+		g.Printf(f.GenerateFunc())
 	}
 
 	err = g.WriteToFile()

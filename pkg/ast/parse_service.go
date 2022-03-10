@@ -6,6 +6,7 @@ import (
 	"go/parser"
 	"go/token"
 	"path/filepath"
+	"strings"
 
 	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/util"
@@ -64,14 +65,18 @@ func NewPkg(dirs []string) (pkg *Pkg, err error) {
 }
 
 func generateEndpointStrcut(prefix string, fields []*Field, fieldMap map[string]bool) (code string) {
+
 	for _, field := range fields {
-		if field.FieldType == FieldTypeStruct {
-			generateEndpointStrcut(field.Name, field.Fields, fieldMap)
+		if field.TypeString == "error" {
+			return
+		}
+		if len(field.Fields) != 0 {
+			code += generateEndpointStrcut(field.Name, field.Fields, fieldMap)
 		} else {
-			name := field.Name
+			name := strings.Title(field.Name)
 			exits, _ := fieldMap[field.Name]
 			if exits {
-				name = fmt.Sprintf("%s%s", prefix, field.Name)
+				name = fmt.Sprintf("%s%s", prefix, name)
 			}
 			code += fmt.Sprintf("\t%s  %s\n", name, field.TypeString)
 			fieldMap[name] = true
@@ -83,22 +88,25 @@ func generateEndpointStrcut(prefix string, fields []*Field, fieldMap map[string]
 func (f *Func) GenerateRequestStrcut() (code string) {
 	// 写入struct
 	requestMap := make(map[string]bool)
-	code = fmt.Sprintf("type %sRequest struct { \n", f.Name)
+	code = fmt.Sprintf("\ntype %sRequest struct { \n", f.Name)
 	code += generateEndpointStrcut("", f.Request, requestMap)
+	code += ("} \n")
 	return
 }
 func (f *Func) GenerateResponseStrcut() (code string) {
 	// 写入struct
 	m := make(map[string]bool)
-	code = fmt.Sprintf("type %sResponse struct { \n", f.Name)
+	code = fmt.Sprintf("\ntype %sResponse struct { \n", f.Name)
 	code += generateEndpointStrcut("", f.Response, m)
+	code += ("} \n")
 	return
 }
 
 func (f *Func) GenerateFunc() (code string) {
 	//TODO 写入func
 	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name, f.Name, f.Name)
-	code += fmt.Sprintf("")
+	code += fmt.Sprintf("return \n")
+	code += fmt.Sprintf("}\n")
 	return
 
 }
@@ -117,7 +125,11 @@ func (pkg *Pkg) ParseFeildOfStruct(structName string) (feildList []*Field) {
 								structType, ok := typespec.Type.(*ast.StructType)
 								if ok {
 									for _, f := range structType.Fields.List {
-										feildList = append(feildList, pkg.ParseFeild(f))
+										field := pkg.ParseFeild(f)
+										if field != nil {
+											feildList = append(feildList, pkg.ParseFeild(f))
+										}
+
 									}
 								}
 								return
@@ -212,7 +224,7 @@ func ParseFile(path, name string) (p *Parser, err error) {
 									for _, param := range funcType.Params.List {
 										feild := pkg.ParseFeild(param)
 										if feild != nil {
-											request = append(request, pkg.ParseFeild(param))
+											request = append(request, feild)
 										}
 
 									}
@@ -220,11 +232,9 @@ func ParseFile(path, name string) (p *Parser, err error) {
 									// 遍历函数返回值
 									response := make([]*Field, 0)
 									for _, result := range funcType.Results.List {
-										response = append(response, pkg.ParseFeild(result))
-
 										feild := pkg.ParseFeild(result)
 										if feild != nil {
-											response = append(response, pkg.ParseFeild(result))
+											response = append(response, feild)
 										}
 									}
 									funcs.Response = response
@@ -258,14 +268,14 @@ func ParseFile(path, name string) (p *Parser, err error) {
 	return
 }
 
-func (f *Field) Log() {
+func (f *Field) Log(prefix string) {
 	if f == nil {
 		return
 	}
-	fmt.Printf("%s %s %s\n", f.Name, f.TypeString, f.FieldType)
+	fmt.Printf("%s%s %s %s\n", prefix, f.Name, f.TypeString, f.FieldType)
 	if f.Fields != nil {
 		for _, field := range f.Fields {
-			field.Log()
+			field.Log(f.Name)
 		}
 	}
 

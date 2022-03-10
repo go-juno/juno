@@ -2,7 +2,9 @@ package command
 
 import (
 	"fmt"
+	"log"
 
+	"github.com/go-juno/juno/internal/endpoint"
 	"github.com/go-juno/juno/pkg/cli"
 	"github.com/go-juno/juno/pkg/cli/flag"
 )
@@ -16,13 +18,13 @@ func (t *CreateEndpointCommand) Main() {
 		fmt.Println("endpoint name required")
 		return
 	}
-	// req := &endpoint.CreateEndpointRequest{
-	// 	Name: name,
-	// }
-	// err := t.endpoint.CreateEndpointEndpoint(req)
-	// if err != nil {
-	// 	log.Printf("err: %+v", err)
-	// }
+	req := &endpoint.CreateEndpointRequest{
+		Name: name,
+	}
+	err := endpoint.CreateEndpointEndpoint(req)
+	if err != nil {
+		log.Printf("err: %+v", err)
+	}
 
 }
 
