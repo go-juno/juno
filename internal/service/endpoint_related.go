@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-juno/juno/internal/constant"
-	"github.com/go-juno/juno/pkg/ast"
+
 	"github.com/go-juno/juno/pkg/generator"
 	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/xerrors"
@@ -60,7 +60,7 @@ func GeneratorEndpoint(mod, name string) (err error) {
 		return
 	}
 	path := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
-	p, err := ast.ParseFile(path, name)
+	p, err := ParseFile(path, name)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
