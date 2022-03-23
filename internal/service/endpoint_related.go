@@ -78,7 +78,7 @@ func GeneratorEndpoint(mod, name string) (err error) {
 	for _, f := range p.Funcs {
 		g.Printf(f.GenerateRequestStrcut())
 		g.Printf(f.GenerateResponseStrcut())
-		g.Printf(f.GenerateFunc())
+		g.Printf(f.GenerateFunc(name))
 	}
 
 	err = g.WriteToFile()

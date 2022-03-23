@@ -44,5 +44,12 @@ func CreateServiceEndpoint(request *CreateServiceRequest) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	// import信息更新
+	err = command.GoimportsCode()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
 	return
 }

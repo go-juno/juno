@@ -83,13 +83,15 @@ func (g *Generator) format() (src []byte, err error) {
 	src = bytes.ReplaceAll(src, constant.TplCamel, []byte(camel))
 	src = bytes.ReplaceAll(src, constant.TplClass, []byte(class))
 	src = bytes.ReplaceAll(src, constant.TplSnake, []byte(snake))
-	// err = ioutil.WriteFile(g.filePath, src, 0644)
-	// if err != nil {
-	// 	err = xerrors.Errorf("%w", err)
-	// 	return
-	// }
+	c := src
+
 	src, err = format.Source(src)
 	if err != nil {
+		err = ioutil.WriteFile(g.filePath+".tpl", c, 0644)
+		if err != nil {
+			err = xerrors.Errorf("%w", err)
+			return
+		}
 		err = xerrors.Errorf("%w", err)
 		return
 	}

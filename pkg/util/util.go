@@ -1,6 +1,7 @@
 package util
 
 import (
+	"os"
 	"strings"
 
 	"golang.org/x/tools/go/packages"
@@ -61,9 +62,7 @@ func CamelString(s string) string {
 }
 
 func GetPwd() (dir string) {
-	// dir, _ = os.Getwd()
-	// return
-	dir = "/Users/admin/my/kit-service"
+	dir, _ = os.Getwd()
 	return
 }
 
