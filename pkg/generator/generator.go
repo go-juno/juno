@@ -1,14 +1,12 @@
 package generator
 
 import (
-	"bytes"
 	"fmt"
 	"go/format"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/xerrors"
 )
@@ -18,7 +16,7 @@ type Generator struct {
 	path     string
 	mod      string
 	filePath string
-	buf      bytes.Buffer // Accumulated output.
+	content  string
 }
 
 func NewGenerator(name, path, mod string) (g *Generator, err error) {
@@ -31,18 +29,7 @@ func NewGenerator(name, path, mod string) (g *Generator, err error) {
 		path:     path,
 		mod:      mod,
 		filePath: filePath,
-		buf:      bytes.Buffer{},
-	}
-
-	ok := g.IsExistsFile()
-	if ok {
-		var content []byte
-		content, err = util.ReadAll(filePath)
-		if err != nil {
-			err = xerrors.Errorf("%w", err)
-			return
-		}
-		g.buf = *bytes.NewBuffer(content)
+		content:  "",
 	}
 	return
 }
@@ -63,39 +50,25 @@ func (g *Generator) IsExistsFile() (ok bool) {
 }
 
 func (g *Generator) Contains(content string) (ok bool) {
-	ok = bytes.Contains(g.buf.Bytes(), []byte(content))
+	ok = strings.Contains(g.content, content)
 	return
 }
 
-func (g *Generator) Printf(format string, args ...interface{}) {
-	fmt.Fprintf(&g.buf, format, args...)
-}
-
-func (g *Generator) Replace(old string, new string) {
-	src := bytes.ReplaceAll(g.buf.Bytes(), []byte(old), []byte(new))
-	g.buf = *bytes.NewBuffer(src)
-}
-
 func (g *Generator) format() (src []byte, err error) {
-	camel, class, snake, hyphen := util.TransformName(g.name)
-	src = bytes.ReplaceAll(g.buf.Bytes(), constant.TplHyphen, []byte(hyphen))
-	src = bytes.ReplaceAll(src, constant.TplMod, []byte(g.mod))
-	src = bytes.ReplaceAll(src, constant.TplCamel, []byte(camel))
-	src = bytes.ReplaceAll(src, constant.TplClass, []byte(class))
-	src = bytes.ReplaceAll(src, constant.TplSnake, []byte(snake))
-	c := src
-
-	src, err = format.Source(src)
+	src, err = format.Source([]byte(g.content))
 	if err != nil {
-		err = ioutil.WriteFile(g.filePath+".tpl", c, 0644)
-		if err != nil {
-			err = xerrors.Errorf("%w", err)
-			return
-		}
 		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
+}
+
+func (g *Generator) SetContent(content string) {
+	g.content = content
+}
+
+func (g *Generator) GetPath() string {
+	return g.path
 }
 
 func (g *Generator) WriteToFile() (err error) {
@@ -110,7 +83,7 @@ func (g *Generator) WriteToFile() (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	err = ioutil.WriteFile(g.filePath, src, 0644)
+	err = os.WriteFile(g.filePath, src, 0644)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

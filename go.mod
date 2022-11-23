@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/google/wire v0.5.0
+	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.10
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 )

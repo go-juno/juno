@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/xerrors"
 )
@@ -32,6 +34,11 @@ func SnakeString(s string) string {
 		data = append(data, d)
 	}
 	return strings.ToLower(string(data[:]))
+}
+
+func TitleString(s string) string {
+	caser := cases.Title(language.BrazilianPortuguese)
+	return caser.String(s)
 }
 
 func CamelString(s string) string {

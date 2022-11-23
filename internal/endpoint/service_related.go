@@ -31,12 +31,12 @@ func CreateServiceEndpoint(request *CreateServiceRequest) (err error) {
 		return
 	}
 
-	// 更新endpoint wire
-	err = service.WireEndpoint(mod, request.Name)
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
-	}
+	// // 更新endpoint wire
+	// err = service.WireEndpoint(mod, request.Name)
+	// if err != nil {
+	// 	err = xerrors.Errorf("%w", err)
+	// 	return
+	// }
 
 	//生成wire
 	err = command.RunWire()

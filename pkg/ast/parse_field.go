@@ -6,10 +6,11 @@ import (
 	"go/parser"
 	"go/token"
 	"path/filepath"
-	"strings"
 
 	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/util"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/xerrors"
 )
@@ -73,8 +74,9 @@ func generateEndpointStrcut(prefix string, fields []*Field, fieldMap map[string]
 		if len(field.Fields) != 0 {
 			code += generateEndpointStrcut(field.Name, field.Fields, fieldMap)
 		} else {
-			name := strings.Title(field.Name)
-			exits, _ := fieldMap[field.Name]
+			caser := cases.Title(language.BrazilianPortuguese)
+			name := caser.String(field.Name)
+			exits := fieldMap[field.Name]
 			if exits {
 				name = fmt.Sprintf("%s%s", prefix, name)
 			}
@@ -105,8 +107,8 @@ func (f *Func) GenerateResponseStrcut() (code string) {
 func (f *Func) GenerateFunc() (code string) {
 	//TODO 写入func
 	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name, f.Name, f.Name)
-	code += fmt.Sprintf("return \n")
-	code += fmt.Sprintf("}\n")
+	code += "return \n"
+	code += "}\n"
 	return
 
 }

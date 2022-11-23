@@ -6,8 +6,8 @@ import (
 	"go/parser"
 	"go/token"
 	"path/filepath"
-	"strings"
 
+	"github.com/go-juno/juno/pkg/util"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/xerrors"
 )
@@ -59,7 +59,7 @@ func generateEndpointStrcut(fields []*Field) (code string) {
 		if field.TypeString == "error" || field.TypeString == "context.Context" {
 			continue
 		}
-		name := strings.Title(field.Name)
+		name := util.TitleString(field.Name)
 		code += fmt.Sprintf("\t%s  %s\n", name, field.TypeString)
 	}
 	return
@@ -93,7 +93,7 @@ func (f *Func) GenerateFunc(name string) (code string) {
 		if requestParam != "" {
 			requestParam += ", "
 		}
-		requestParam += "request." + strings.Title(field.Name)
+		requestParam += "request." + util.TitleString(field.Name)
 	}
 
 	//获取返回值变量
@@ -112,10 +112,10 @@ func (f *Func) GenerateFunc(name string) (code string) {
 
 	}
 
-	code += fmt.Sprintf("\tif err != nil {\n")
-	code += fmt.Sprint("\t\terr = xerrors.Errorf(\"%%w\", err)\n")
-	code += fmt.Sprintf("\t\treturn\n")
-	code += fmt.Sprintf("\t}\n")
+	code += "\tif err != nil {\n"
+	code += "\t\terr = xerrors.Errorf(\"%%w\", err)\n"
+	code += "\t\treturn\n"
+	code += "\t}\n"
 
 	//返回endpoint
 	code += fmt.Sprintf("\tresponse = &%sResponse{\n", f.Name)
@@ -123,12 +123,12 @@ func (f *Func) GenerateFunc(name string) (code string) {
 		if field.TypeString == "error" || field.TypeString == "context.Context" {
 			continue
 		}
-		code += fmt.Sprintf("\t\t%s: %s,\n", strings.Title(field.Name), field.Name)
+		code += fmt.Sprintf("\t\t%s: %s,\n", util.TitleString(field.Name), field.Name)
 	}
-	code += fmt.Sprintf("\t}\n")
+	code += "\t}\n"
 
-	code += fmt.Sprintf("\treturn \n")
-	code += fmt.Sprintf("}\n")
+	code += "\treturn \n"
+	code += "}\n"
 	return
 
 }

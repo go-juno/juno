@@ -1,11 +1,14 @@
 package static
 
 import (
-	_ "embed"
+	"embed"
 )
 
 //go:embed tpl/service.tpl
-var ServiceTpl string
+var ServiceTpl embed.FS
 
 //go:embed tpl/mod.tpl
 var ModTpl string
+
+//go:embed tpl/service_wire.tpl
+var ServiceWire embed.FS

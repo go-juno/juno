@@ -126,7 +126,7 @@ type Package struct {
 // parsePackage exits if there is an error.
 func (g *Generator) parsePackage(patterns []string) {
 	cfg := &packages.Config{
-		Mode:  packages.LoadSyntax,
+		Mode:  packages.NeedSyntax,
 		Tests: false,
 	}
 	pkgs, err := packages.Load(cfg, patterns...)

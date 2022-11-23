@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+
 	"strings"
 
 	"github.com/go-juno/juno/internal/constant"
@@ -54,7 +55,7 @@ func Mkdir(dir string) (err error) {
 
 func TransformName(name string) (camel, class, snake, hyphen string) {
 	camel = CamelString(name)
-	class = strings.Title(camel)
+	class = TitleString(camel)
 	snake = SnakeString(camel)
 	hyphen = strings.ReplaceAll(snake, "_", "-")
 	return
@@ -219,8 +220,7 @@ func ReplaceAll(root, old, new string) (err error) {
 
 func CreateMod(root string) (err error) {
 	path := fmt.Sprintf("%s/go.mod", root)
-	str := static.ModTpl
-	if err = WriteToFile(path, str); err != nil {
+	if err = WriteToFile(path, static.ModTpl); err != nil {
 		return
 	}
 	return
