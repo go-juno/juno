@@ -1,6 +1,6 @@
 repos:
-  - repo: git://github.com/joker8023/pre-commit-golang
-    rev: v1.4
+  - repo: https://github.com/go-juno/pre-commit-golang
+    rev: v0.0.1
     hooks:
       - id: go-fmt
       - id: go-vet
