@@ -82,7 +82,7 @@ func (f *Func) GenerateResponseStrcut() (code string) {
 }
 
 func (f *Func) GenerateFunc(name string) (code string) {
-	//TODO 写入func
+	// 写入func
 	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name, f.Name, f.Name)
 	//获取请求值变量
 	requestParam := ""
@@ -228,6 +228,7 @@ func ParseFile(path, name string) (p *Parser, err error) {
 
 		}
 	}
+
 	return
 }
 

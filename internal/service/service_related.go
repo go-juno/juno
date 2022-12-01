@@ -3,8 +3,9 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"html/template"
+	"log"
 	"sort"
+	"text/template"
 
 	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/generator"
@@ -15,9 +16,9 @@ import (
 )
 
 type ServiceTplParam struct {
-	mod   string
-	class string
-	camel string
+	Mod   string
+	Class string
+	Camel string
 }
 
 // 生成新的service
@@ -28,17 +29,17 @@ func GeneratorService(mod, name string) (err error) {
 		return
 	}
 	if g.IsExistsFile() {
-		err = xerrors.Errorf("service:%s already exists", name)
+		log.Printf("service:%s already exists", name)
 		return
 	}
 
 	camel, class, _, _ := util.TransformName(name)
 	stp := &ServiceTplParam{
-		mod:   mod,
-		class: class,
-		camel: camel,
+		Mod:   mod,
+		Class: class,
+		Camel: camel,
 	}
-	tpl, err := template.ParseFS(static.ServiceTpl)
+	tpl, err := template.New("service").Parse(static.ServiceTpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -89,7 +90,7 @@ func WireService(mod, name string) (err error) {
 		}
 	}
 
-	tpl, err := template.ParseFS(static.ServiceWire)
+	tpl, err := template.New("s").Parse(static.ServiceWireTpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

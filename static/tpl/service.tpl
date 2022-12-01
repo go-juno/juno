@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"{{.mod}}/internal/model"
+	"{{.Mod}}/internal/model"
 
 	"golang.org/x/xerrors"
 
@@ -10,84 +10,83 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type {{.class}}Service interface {
-	Get{{.class}}List(ctx context.Context, pageIndex int, pageSize int) ({{.camel}}List []*model.{{.class}}, total int64, err error)
-	Get{{.class}}All(ctx context.Context) ({{.camel}}List []*model.{{.class}}, err error)
-	Get{{.class}}Detail(ctx context.Context, id uint) ({{.camel}} *model.{{.class}}, err error)
-	Create{{.class}}(ctx context.Context, {{.camel}} *model.{{.class}}) (err error)
-	Update{{.class}}(ctx context.Context, {{.camel}} *model.{{.class}}) (err error)
-	Delete{{.class}}(ctx context.Context, id uint) (err error)
+type {{.Class}}Service interface {
+	Get{{.Class}}List(ctx context.Context, pageIndex int, pageSize int) ({{.Camel}}List []*model.{{.Class}}, total int64, err error)
+	Get{{.Class}}All(ctx context.Context) ({{.Camel}}List []*model.{{.Class}}, err error)
+	Get{{.Class}}Detail(ctx context.Context, id uint) ({{.Camel}} *model.{{.Class}}, err error)
+	Create{{.Class}}(ctx context.Context, {{.Camel}} *model.{{.Class}}) (err error)
+	Update{{.Class}}(ctx context.Context, {{.Camel}} *model.{{.Class}}) (err error)
+	Delete{{.Class}}(ctx context.Context, id uint) (err error)
 }
 
-type {{.camel}}Service struct {
+type {{.Camel}}Service struct {
 	db *gorm.DB
 }
 
-func (s *{{.camel}}Service) Get{{.class}}List(ctx context.Context, pageIndex int, pageSize int) ({{.camel}}List []*model.{{.class}}, total int64, err error) {
-	query := s.db.Model(&model.{{.class}}{})
+func (s *{{.Camel}}Service) Get{{.Class}}List(ctx context.Context, pageIndex int, pageSize int) ({{.Camel}}List []*model.{{.Class}}, total int64, err error) {
+	query := s.db.WithContext(ctx).Model(&model.{{.Class}}{})
 	err = query.Count(&total).
 		Offset((pageIndex - 1) * pageSize).
 		Limit(pageSize).
 		Order("created_at desc,id desc").
-		Find(&{{.camel}}List).Error
+		Find(&{{.Camel}}List).Error
 
 	if err != nil {
-		err = xerrors.Errorf("%%w", err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
 }
 
-func (s *{{.camel}}Service) Get{{.class}}All(ctx context.Context) ({{.camel}}List []*model.{{.class}}, err error) {
-	err = s.db.Model(&model.{{.class}}{}).
+func (s *{{.Camel}}Service) Get{{.Class}}All(ctx context.Context) ({{.Camel}}List []*model.{{.Class}}, err error) {
+	err = s.db.WithContext(ctx).Model(&model.{{.Class}}{}).
 		Order("created_at desc,id desc").
-		Find(&{{.camel}}List).Error
+		Find(&{{.Camel}}List).Error
 	if err != nil {
-		err = xerrors.Errorf("%%w", err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
 }
 
-func (s *{{.camel}}Service) Get{{.class}}Detail(ctx context.Context, id uint) ({{.camel}} *model.{{.class}}, err error) {
-	err = s.db.Model(&model.{{.class}}{}).Where("id = ?", id).Find(&{{.camel}}).Error
+func (s *{{.Camel}}Service) Get{{.Class}}Detail(ctx context.Context, id uint) ({{.Camel}} *model.{{.Class}}, err error) {
+	err = s.db.WithContext(ctx).Model(&model.{{.Class}}{}).Where("id = ?", id).Find(&{{.Camel}}).Error
 	if err != nil {
-		err = xerrors.Errorf("%%w", err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
 }
 
-func (s *{{.camel}}Service) Create{{.class}}(ctx context.Context, {{.camel}} *model.{{.class}}) (err error) {
-	err = s.db.Clauses(clause.OnConflict{
+func (s *{{.Camel}}Service) Create{{.Class}}(ctx context.Context, {{.Camel}} *model.{{.Class}}) (err error) {
+	err = s.db.WithContext(ctx).Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create({{.camel}}).Error
+	}).Create({{.Camel}}).Error
 	if err != nil {
-		err = xerrors.Errorf("%%w", err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
 }
 
-func (s *{{.camel}}Service) Update{{.class}}(ctx context.Context, {{.camel}} *model.{{.class}}) (err error) {
-
-	err = s.db.Model(&model.{{.class}}{}).Where("id = ?", {{.camel}}.Id).Updates({{.camel}}).Error
+func (s *{{.Camel}}Service) Update{{.Class}}(ctx context.Context, {{.Camel}} *model.{{.Class}}) (err error) {
+	err = s.db.WithContext(ctx).Model(&model.{{.Class}}{}).Where("id = ?", {{.Camel}}.Id).Updates({{.Camel}}).Error
 	if err != nil {
-		err = xerrors.Errorf("%%w", err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
 }
 
-func (s *{{.camel}}Service) Delete{{.class}}(ctx context.Context, id uint) (err error) {
-	err = s.db.Where("id = ?", id).Delete(&model.{{.class}}{}).Error
+func (s *{{.Camel}}Service) Delete{{.Class}}(ctx context.Context, id uint) (err error) {
+	err = s.db.WithContext(ctx).Where("id = ?", id).Delete(&model.{{.Class}}{}).Error
 	if err != nil {
-		err = xerrors.Errorf("%%w", err)
+		err = xerrors.Errorf("%w", err)
 		return
 	}
 	return
 }
 
-func New{{.class}}Service(db *gorm.DB) {{.class}}Service {
-	return &{{.camel}}Service{db: db}
+func New{{.Class}}Service(db *gorm.DB) {{.Class}}Service {
+	return &{{.Camel}}Service{db: db}
 }

@@ -3,6 +3,7 @@ package generator
 import (
 	"fmt"
 	"go/format"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -57,7 +58,8 @@ func (g *Generator) Contains(content string) (ok bool) {
 func (g *Generator) format() (src []byte, err error) {
 	src, err = format.Source([]byte(g.content))
 	if err != nil {
-		err = xerrors.Errorf("%w", err)
+		log.Printf("format err:%+v", err)
+		src = []byte(g.content)
 		return
 	}
 	return

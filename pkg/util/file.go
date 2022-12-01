@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -135,7 +134,7 @@ func ReadAll(filePth string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(f)
+	return io.ReadAll(f)
 }
 
 func CopyPath(src, dst string) (ok bool, err error) {
@@ -236,7 +235,7 @@ func GetApiPrefix() (apiPrefix string, err error) {
 	}
 	defer file.Close()
 	var content []byte
-	content, err = ioutil.ReadAll(file)
+	content, err = io.ReadAll(file)
 	reg, err := regexp.Compile(`"/api/(.*)"`)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
