@@ -1,8 +1,6 @@
 package endpoint
 
 import (
-	"context"
-	"golang.org/x/xerrors"
     {{ range .Packages }}
     {{ . }}
     {{- end }}
@@ -10,22 +8,22 @@ import (
 
 
     {{ range .Funcs }}
-type {{.Name}}Request struct {
+type {{.Name.Class }}Request struct {
     {{- range .Request }}
     {{- if (and (ne .TypeString "error") (ne .TypeString "context.Context"))}}
-    {{ .Name }}  {{ .TypeString }}
+    {{ .Name.Class }}  {{ .TypeString }}
     {{- end }}
     {{- end }}
 }
 
-type {{.Name}}Response struct {
+type {{.Name.Class}}Response struct {
     {{- range .Response }}
     {{- if (and (ne .TypeString "error") (ne .TypeString "context.Context"))}}
-    {{ .Name }}  {{ .TypeString }}
+    {{ .Name.Class }}  {{ .TypeString }}
     {{- end }}
     {{- end }}
 }
 
-
+{{ .FunCode }}
 
     {{ end }}

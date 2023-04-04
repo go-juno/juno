@@ -12,24 +12,44 @@ import (
 	"golang.org/x/xerrors"
 )
 
+type Name struct {
+	Class  string
+	Camel  string
+	Snake  string
+	Hyphen string
+}
+
 type Field struct {
-	Name       string
+	Name       Name
 	TypeString string
 }
 
 type Func struct {
-	Name     string
+	Name     Name
 	Request  []*Field
 	Response []*Field
+	FunCode  string
 }
 
 type Parser struct {
+	Name     Name
 	Funcs    []*Func
 	Packages []string
 }
 
 type Pkg struct {
 	Files []*ast.File
+}
+
+func NewName(name string) (n *Name) {
+	camel, class, snake, hyphen := util.TransformName(name)
+	n = &Name{
+		Class:  class,
+		Camel:  camel,
+		Snake:  snake,
+		Hyphen: hyphen,
+	}
+	return
 }
 
 func NewPkg(dirs []string) (pkg *Pkg, err error) {
@@ -53,37 +73,9 @@ func NewPkg(dirs []string) (pkg *Pkg, err error) {
 	return
 }
 
-func generateEndpointStrcut(fields []*Field) (code string) {
-
-	for _, field := range fields {
-		if field.TypeString == "error" || field.TypeString == "context.Context" {
-			continue
-		}
-		name := util.TitleString(field.Name)
-		code += fmt.Sprintf("\t%s  %s\n", name, field.TypeString)
-	}
-	return
-}
-
-func (f *Func) GenerateRequestStrcut() (code string) {
-	// 写入struct
-	code = fmt.Sprintf("\ntype %sRequest struct { \n", f.Name)
-	code += generateEndpointStrcut(f.Request)
-	code += ("} \n")
-	return
-}
-
-func (f *Func) GenerateResponseStrcut() (code string) {
-	// 写入struct
-	code = fmt.Sprintf("\ntype %sResponse struct { \n", f.Name)
-	code += generateEndpointStrcut(f.Response)
-	code += ("} \n")
-	return
-}
-
 func (f *Func) GenerateFunc(name string) (code string) {
 	// 写入func
-	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name, f.Name, f.Name)
+	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name.Class, f.Name.Class, f.Name.Class)
 	//获取请求值变量
 	requestParam := ""
 	for _, field := range f.Request {
@@ -93,7 +85,7 @@ func (f *Func) GenerateFunc(name string) (code string) {
 		if requestParam != "" {
 			requestParam += ", "
 		}
-		requestParam += "request." + util.TitleString(field.Name)
+		requestParam += "request." + field.Name.Class
 	}
 
 	//获取返回值变量
@@ -102,13 +94,13 @@ func (f *Func) GenerateFunc(name string) (code string) {
 		if responseParam != "" {
 			responseParam += ", "
 		}
-		responseParam += field.Name
+		responseParam += field.Name.Camel
 	}
 	if len(f.Response) == 1 {
-		code += fmt.Sprintf("\t%s = e.%s.%s(ctx, %s) \n", responseParam, name, f.Name, requestParam)
+		code += fmt.Sprintf("\t%s = e.%s.%s(ctx, %s) \n", responseParam, name, f.Name.Class, requestParam)
 
 	} else {
-		code += fmt.Sprintf("\t%s := e.%s.%s(ctx, %s) \n", responseParam, name, f.Name, requestParam)
+		code += fmt.Sprintf("\t%s := e.%s.%s(ctx, %s) \n", responseParam, name, f.Name.Class, requestParam)
 
 	}
 
@@ -118,12 +110,12 @@ func (f *Func) GenerateFunc(name string) (code string) {
 	code += "\t}\n"
 
 	//返回endpoint
-	code += fmt.Sprintf("\tresponse = &%sResponse{\n", f.Name)
+	code += fmt.Sprintf("\tresponse = &%sResponse{\n", f.Name.Class)
 	for _, field := range f.Response {
 		if field.TypeString == "error" || field.TypeString == "context.Context" {
 			continue
 		}
-		code += fmt.Sprintf("\t\t%s: %s,\n", util.TitleString(field.Name), field.Name)
+		code += fmt.Sprintf("\t\t%s: %s,\n", field.Name.Class, field.Name.Camel)
 	}
 	code += "\t}\n"
 
@@ -157,8 +149,9 @@ func (pkg *Pkg) ParseFeild(af *ast.Field) (f *Field) {
 	if len(af.Names) == 0 {
 		return
 	}
+	name := NewName(af.Names[0].Name)
 	f = &Field{
-		Name:       af.Names[0].Name,
+		Name:       *name,
 		TypeString: "",
 	}
 	f.ParseFeildType(af.Type, pkg)
@@ -193,7 +186,7 @@ func ParseFile(path, name string) (p *Parser, err error) {
 							// 遍历接口
 							for _, method := range interfaceType.Methods.List {
 								funcs := &Func{
-									Name: method.Names[0].Name,
+									Name: *NewName(method.Names[0].Name),
 								}
 								funcType, ok := method.Type.(*ast.FuncType)
 								if ok {
@@ -217,6 +210,7 @@ func ParseFile(path, name string) (p *Parser, err error) {
 									}
 									funcs.Response = response
 								}
+								funcs.FunCode = funcs.GenerateFunc(name)
 								p.Funcs = append(p.Funcs, funcs)
 								p.GenPackage(pkg)
 

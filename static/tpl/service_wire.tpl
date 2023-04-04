@@ -1,15 +1,13 @@
 package service
 
+
 import (
-{{ range .Import }}
- {{ . }}
-{{- end }}
+	"github.com/google/wire"
 )
 
 
-
 var ProviderSet = wire.NewSet(
-{{ range .ServiceName }}
- {{ . }},
-{{- end }}
+	{{- range .ServiceList }}
+ 	{{ .NewFuncName }},
+	{{- end }}
 )

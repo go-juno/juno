@@ -60,6 +60,7 @@ func (g *Generator) format() (src []byte, err error) {
 	if err != nil {
 		log.Printf("format err:%+v", err)
 		src = []byte(g.content)
+		err = nil
 		return
 	}
 	return

@@ -2,14 +2,11 @@ package service
 
 import (
 	"bytes"
-	"fmt"
 	"log"
-	"sort"
 	"text/template"
 
 	"github.com/go-juno/juno/internal/constant"
 	"github.com/go-juno/juno/pkg/generator"
-	"github.com/go-juno/juno/pkg/parse"
 	"github.com/go-juno/juno/pkg/util"
 	"github.com/go-juno/juno/static"
 	"golang.org/x/xerrors"
@@ -19,6 +16,11 @@ type ServiceTplParam struct {
 	Mod   string
 	Class string
 	Camel string
+}
+
+type ServiceWireTplParam struct {
+	Mod         string
+	ServiceList []*Service
 }
 
 // 生成新的service
@@ -67,27 +69,15 @@ func WireService(mod, name string) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-
-	var w *parse.ServiceWire
-	// 当前service的名称
-	sn := fmt.Sprintf("New%sService", util.TitleString(name))
-
-	if g.IsExistsFile() {
-
-		// 先解析文件中已存在的包和service
-		w, err = parse.ParseServiceWire(g.GetPath())
-		if err != nil {
-			err = xerrors.Errorf("%w", err)
-			return
-		}
-		// 加入当前的service
-		w.ServiceName = append(w.ServiceName, sn)
-		sort.Strings(w.ServiceName)
-	} else {
-		w = &parse.ServiceWire{
-			ServiceName: []string{sn},
-			Import:      []string{"github.com/google/wire"},
-		}
+	// 先解析文件中已存在的包和service
+	w, err := ParseServiceWire(g.GetPath())
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	serviceWire := &ServiceWireTplParam{
+		Mod:         mod,
+		ServiceList: w,
 	}
 
 	tpl, err := template.New("s").Parse(static.ServiceWireTpl)
@@ -96,7 +86,7 @@ func WireService(mod, name string) (err error) {
 		return
 	}
 	b := bytes.NewBuffer([]byte{})
-	err = tpl.Execute(b, w)
+	err = tpl.Execute(b, serviceWire)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

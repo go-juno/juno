@@ -37,7 +37,7 @@ func SnakeString(s string) string {
 }
 
 func TitleString(s string) string {
-	caser := cases.Title(language.BrazilianPortuguese)
+	caser := cases.Title(language.Und, cases.NoLower)
 	return caser.String(s)
 }
 

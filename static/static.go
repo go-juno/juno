@@ -15,3 +15,6 @@ var ServiceWireTpl string
 
 //go:embed tpl/endpoint.tpl
 var EndpointTpl string
+
+//go:embed tpl/endpoint_wire.tpl
+var EndpointWire string
