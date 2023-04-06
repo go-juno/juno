@@ -13,5 +13,5 @@ var (
 	GrpcDirPath     = "api/grpc"
 	WireFilePath    = "cmd/wire.go"
 	ConstantPath    = "internal/constant"
-	ModelPath       = "internal/model"
+	ModelPath       = "internal/entity"
 )
