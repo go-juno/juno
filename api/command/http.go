@@ -1,22 +1,20 @@
 package command
 
 import (
-	"fmt"
+	"log"
 
+	"github.com/go-juno/juno/internal/endpoint"
 	"github.com/go-juno/juno/pkg/cli"
-	"github.com/go-juno/juno/pkg/cli/flag"
 )
 
 type CreateHttpCommand struct {
 }
 
 func (t *CreateHttpCommand) Main() {
-	name := flag.Arguments().First().String()
-	if name == "" {
-		fmt.Println("http name required")
-		return
+	err := endpoint.CreateHttpEndpoint(&endpoint.CreateHttpRequest{})
+	if err != nil {
+		log.Printf("err: %+v", err)
 	}
-
 }
 
 func NewCreateHttpCommand() *cli.Command {

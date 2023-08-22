@@ -18,3 +18,6 @@ var EndpointTpl string
 
 //go:embed tpl/endpoint_wire.tpl
 var EndpointWire string
+
+//go:embed tpl/http.tpl
+var HttpTpl string

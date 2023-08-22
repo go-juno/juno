@@ -29,6 +29,7 @@ type Func struct {
 	Request  []*Field
 	Response []*Field
 	FunCode  string
+	Method   string
 }
 
 type Parser struct {
@@ -74,6 +75,7 @@ func NewPkg(dirs []string) (pkg *Pkg, err error) {
 }
 
 func (f *Func) GenerateFunc(name string) (code string) {
+	camel, _, _, _ := util.TransformName(name)
 	// 写入func
 	code = fmt.Sprintf("func (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name.Class, f.Name.Class, f.Name.Class)
 	//获取请求值变量
@@ -97,15 +99,15 @@ func (f *Func) GenerateFunc(name string) (code string) {
 		responseParam += field.Name.Camel
 	}
 	if len(f.Response) == 1 {
-		code += fmt.Sprintf("\t%s = e.%s.%s(ctx, %s) \n", responseParam, name, f.Name.Class, requestParam)
+		code += fmt.Sprintf("\t%s = e.%s.%s(ctx, %s) \n", responseParam, camel, f.Name.Class, requestParam)
 
 	} else {
-		code += fmt.Sprintf("\t%s := e.%s.%s(ctx, %s) \n", responseParam, name, f.Name.Class, requestParam)
+		code += fmt.Sprintf("\t%s := e.%s.%s(ctx, %s) \n", responseParam, camel, f.Name.Class, requestParam)
 
 	}
 
 	code += "\tif err != nil {\n"
-	code += "\t\terr = xerrors.Errorf(\"%%w\", err)\n"
+	code += "\t\terr = xerrors.Errorf(\"%w\", err)\n"
 	code += "\t\treturn\n"
 	code += "\t}\n"
 
@@ -125,11 +127,24 @@ func (f *Func) GenerateFunc(name string) (code string) {
 
 }
 
-func (f *Field) ParseFeildType(expr ast.Expr, p *Pkg) {
+func (f *Func) GenerateEmptyFunc(name string) (code string) {
+	// 写入func
+	code = `// path: /hello
+// method: get
+// description: hello`
+	code += fmt.Sprintf("\nfunc (e *Endpoints) %sEndpoint(ctx context.Context, request *%sRequest) (response *%sResponse, err error) {\n", f.Name.Class, f.Name.Class, f.Name.Class)
+	code += "\t// TODO\n"
+	code += "\treturn \n"
+	code += "}\n"
+	return
+
+}
+
+func (f *Field) ParseFeildType(expr ast.Expr) {
 	switch v := expr.(type) {
 	case *ast.StarExpr:
 		f.TypeString = fmt.Sprintf("%s*", f.TypeString)
-		f.ParseFeildType(v.X, p)
+		f.ParseFeildType(v.X)
 	case *ast.SelectorExpr:
 		var prefix string
 		ident, ok := v.X.(*ast.Ident)
@@ -141,7 +156,7 @@ func (f *Field) ParseFeildType(expr ast.Expr, p *Pkg) {
 		f.TypeString = fmt.Sprintf("%s%s", f.TypeString, v.Name)
 	case *ast.ArrayType:
 		f.TypeString = fmt.Sprintf("%s[]", f.TypeString)
-		f.ParseFeildType(v.Elt, p)
+		f.ParseFeildType(v.Elt)
 	}
 }
 
@@ -154,7 +169,7 @@ func (pkg *Pkg) ParseFeild(af *ast.Field) (f *Field) {
 		Name:       *name,
 		TypeString: "",
 	}
-	f.ParseFeildType(af.Type, pkg)
+	f.ParseFeildType(af.Type)
 	return f
 }
 
@@ -162,6 +177,23 @@ func ParseFile(path, name string) (p *Parser, err error) {
 	p = &Parser{}
 	fset := token.NewFileSet()
 	filename := filepath.Join(path, fmt.Sprintf("%s.go", name))
+	ok, _ := util.IsExistsFile(filename)
+	if !ok {
+		funcs := &Func{
+			Name: *NewName("hello"),
+		}
+		p = &Parser{
+			Name: *NewName(name),
+			Funcs: []*Func{{
+				Name:     *NewName("hello"),
+				Request:  []*Field{},
+				Response: []*Field{},
+				FunCode:  funcs.GenerateEmptyFunc(name),
+			}},
+			Packages: []string{},
+		}
+		return
+	}
 	f, err := parser.ParseFile(fset, filename, nil, parser.AllErrors)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
@@ -209,6 +241,7 @@ func ParseFile(path, name string) (p *Parser, err error) {
 										}
 									}
 									funcs.Response = response
+									funcs.Method = util.GetMethod(funcs.Name.Camel)
 								}
 								funcs.FunCode = funcs.GenerateFunc(name)
 								p.Funcs = append(p.Funcs, funcs)

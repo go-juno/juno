@@ -23,7 +23,6 @@ type Generator struct {
 func NewGenerator(name, path, mod string) (g *Generator, err error) {
 	path = filepath.Join(util.GetPwd(), path)
 	_, _, snake, _ := util.TransformName(name)
-	// 判断文件是否存在, 如果存在,则需要读取文件内容
 	filePath := filepath.Join(path, fmt.Sprintf("%s.go", snake))
 	g = &Generator{
 		name:     name,

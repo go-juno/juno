@@ -22,8 +22,9 @@ func GeneratorEndpoint(mod, name string) (err error) {
 		err = xerrors.Errorf("endpoint:%s already exists", name)
 		return
 	}
+	_, _, snake, _ := util.TransformName(name)
 	path := filepath.Join(util.GetPwd(), constant.ServiceDirPath)
-	p, err := ParseFile(path, name)
+	p, err := ParseFile(path, snake)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -49,7 +50,7 @@ func GeneratorEndpoint(mod, name string) (err error) {
 }
 
 func WireEndpoint(mod, name string) (err error) {
-	g, err := generator.NewGenerator("endpoint", constant.EndpointDirPath, mod)
+	g, err := generator.NewGenerator("wire", constant.EndpointDirPath, mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

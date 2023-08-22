@@ -113,3 +113,9 @@ func RemoveDuplicateElement(languages []string) []string {
 	}
 	return result
 }
+
+func TransformFileName(key string) (name string) {
+	s := strings.Split(key, "/")
+	name = strings.ReplaceAll(s[len(s)-1], ".go", "")
+	return
+}

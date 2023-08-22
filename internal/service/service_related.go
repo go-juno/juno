@@ -64,7 +64,7 @@ func GeneratorService(mod, name string) (err error) {
 
 // 对更新wire文件
 func WireService(mod, name string) (err error) {
-	g, err := generator.NewGenerator("service", constant.ServiceDirPath, mod)
+	g, err := generator.NewGenerator("wire", constant.ServiceDirPath, mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

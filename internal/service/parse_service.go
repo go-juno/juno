@@ -35,7 +35,11 @@ func ParseServiceWire(path string) (w []*Service, err error) {
 							resultType, ok := funcDecl.Type.Results.List[0].Type.(*ast.Ident)
 							if ok {
 								service.ServiceName = resultType.Name
-								name := strings.ReplaceAll(resultType.Name, "Service", "")
+								name := resultType.Name
+								lastIndex := strings.LastIndex(resultType.Name, "Service")
+								if lastIndex != -1 {
+									name = name[:lastIndex]
+								}
 								service.Name = NewName(name)
 								w = append(w, service)
 							}
