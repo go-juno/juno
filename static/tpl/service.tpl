@@ -50,7 +50,7 @@ func (s *{{.Camel}}Service) Get{{.Class}}All(ctx context.Context) ({{.Camel}}Lis
 }
 
 func (s *{{.Camel}}Service) Get{{.Class}}Detail(ctx context.Context, id uint) ({{.Camel}} *entity.{{.Class}}, err error) {
-	err = s.db.WithContext(ctx).Model(&entity.{{.Class}}{}).Where("id = ?", id).Find(&{{.Camel}}).Error
+	err = s.db.WithContext(ctx).Model(&entity.{{.Class}}{}).Where("id = ?", id).Find(&{{.Camel}}).Limit(1).Error
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
