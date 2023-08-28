@@ -18,12 +18,20 @@ func CreateHttpEndpoint(request *CreateHttpRequest) (err error) {
 		return
 	}
 
-	// 先创建内容
+	// 创建handle
 	err = service.GenerateHandle(mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+
+	// 先创建内容
+	err = service.GenerateHttp(mod)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
 	// import信息更新
 	err = command.GoimportsCode()
 	if err != nil {

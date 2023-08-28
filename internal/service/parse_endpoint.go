@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -68,10 +69,14 @@ func parseEndpoint(path string, mod string) (endpointFunc *EndpointFunc, err err
 			}
 		}
 	}
+	sort.Slice(endpointFunc.Funcs, func(i, j int) bool {
+		return endpointFunc.Funcs[i].Path < endpointFunc.Funcs[j].Path
+	})
+
 	return
 }
 
-func GenerateHandle(mod string) (err error) {
+func GenerateHttp(mod string) (err error) {
 	// 解析所有的endpoint文件
 	ef, err := parseEndpoint(constant.EndpointDirPath, mod)
 	if err != nil {
@@ -93,6 +98,39 @@ func GenerateHandle(mod string) (err error) {
 	}
 	b := bytes.NewBuffer([]byte{})
 	err = tpl.Execute(b, ef)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	g.SetContent(b.String())
+	err = g.WriteToFile()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	return
+
+}
+
+func GenerateHandle(mod string) (err error) {
+	var g *generator.Generator
+	g, err = generator.NewGenerator("handle", constant.HttpDirPath, mod)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	if g.IsExistsFile() {
+		return
+	}
+
+	var tpl *template.Template
+	tpl, err = template.New("s").Parse(static.HandleTpl)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+	b := bytes.NewBuffer([]byte{})
+	err = tpl.Execute(b, mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

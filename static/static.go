@@ -21,3 +21,6 @@ var EndpointWire string
 
 //go:embed tpl/http.tpl
 var HttpTpl string
+
+//go:embed tpl/handle.tpl
+var HandleTpl string
