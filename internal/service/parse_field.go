@@ -174,7 +174,11 @@ func (pkg *Pkg) ParseFeild(af *ast.Field) (f *Field) {
 }
 
 func ParseFile(path, name string) (p *Parser, err error) {
-	p = &Parser{}
+	p = &Parser{
+		Name:     *NewName(name),
+		Funcs:    []*Func{},
+		Packages: []string{},
+	}
 	fset := token.NewFileSet()
 	filename := filepath.Join(path, fmt.Sprintf("%s.go", name))
 	ok, _ := util.IsExistsFile(filename)

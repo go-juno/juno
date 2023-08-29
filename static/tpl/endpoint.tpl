@@ -22,9 +22,9 @@ type {{.Name.Class}}Response struct {
     {{- end }}
     {{- end }}
 }
-// @path: /api/{{.Name.Hyphen}}
+// @path: /api/{{$.Name.Hyphen}}
 // @method: {{.Method}}
-// @description: {{.Name.Camel}}
+// @description: {{.Name.Class}}
 {{ .FunCode }}
 
     {{ end }}
