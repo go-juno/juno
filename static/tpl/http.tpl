@@ -7,15 +7,18 @@ import (
 	"{{.Mod}}/internal/constant"
 	"{{.Mod}}/internal/endpoint"
 	"{{.Mod}}/static"
-
+	_ "ep-service/docs"
+	
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func NewHttp(endpoints *endpoint.Endpoints) *http.Server {
 	api := gin.New()
+	api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	api.Use(middleware.ErrMiddleware, middleware.LoggerFormate(), middleware.AuthMiddleware())
     {{- range .Funcs }}
-    // {{.Description}}
     api.{{.Method}}("{{.Path}}", res.EndpointFunc(endpoints.{{.Name}}))
     {{- end }}
 

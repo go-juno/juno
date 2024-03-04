@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"log"
 	"sort"
 	"strings"
 	"text/template"
@@ -16,10 +17,9 @@ import (
 )
 
 type Funcs struct {
-	Name        string
-	Path        string
-	Method      string
-	Description string
+	Name   string
+	Path   string
+	Method string
 }
 
 type EndpointFunc struct {
@@ -41,7 +41,6 @@ func parseEndpoint(path string, mod string) (endpointFunc *EndpointFunc, err err
 	}
 	for _, pkg := range dir {
 		for _, f := range pkg.Files {
-
 			for _, decl := range f.Decls {
 				genDecl, ok := decl.(*ast.FuncDecl)
 				if ok {
@@ -52,15 +51,18 @@ func parseEndpoint(path string, mod string) (endpointFunc *EndpointFunc, err err
 					}
 					if genDecl.Doc != nil {
 						for _, comment := range genDecl.Doc.List {
-							if strings.HasPrefix(comment.Text, "// @path:") {
-								fun.Path = strings.TrimSpace(strings.ReplaceAll(comment.Text, "// @path:", ""))
+							if strings.HasPrefix(comment.Text, "// @Router") {
+								routerSplit := strings.Split(comment.Text, " ")
+								log.Println("routerSplit", routerSplit)
+								if len(routerSplit) >= 4 {
+									fun.Path = routerSplit[2]
+									fun.Method = strings.ReplaceAll(strings.ReplaceAll(routerSplit[3], "[", ""), "]", "")
+								}
 							}
-							if strings.HasPrefix(comment.Text, "// @method:") {
-								fun.Method = strings.ToUpper(strings.TrimSpace(strings.ReplaceAll(comment.Text, "// @method:", "")))
-							}
-							if strings.HasPrefix(comment.Text, "// @description:") {
-								fun.Description = strings.TrimSpace(strings.ReplaceAll(comment.Text, "// @description:", ""))
-							}
+
+						}
+						if fun.Method == "" {
+							continue
 						}
 						endpointFunc.Funcs = append(endpointFunc.Funcs, fun)
 					}

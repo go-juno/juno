@@ -1,6 +1,7 @@
 package util
 
 import (
+	"errors"
 	"os"
 	"strings"
 
@@ -13,7 +14,7 @@ import (
 func Unwrap(err error) (uerr error) {
 	for err != nil {
 		uerr = err
-		err = xerrors.Unwrap(err)
+		err = errors.Unwrap(err)
 
 	}
 	return

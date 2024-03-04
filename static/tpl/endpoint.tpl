@@ -22,9 +22,17 @@ type {{.Name.Class}}Response struct {
     {{- end }}
     {{- end }}
 }
-// @path: /api/{{$.Name.Hyphen}}
-// @method: {{.Method}}
-// @description: {{.Name.Class}}
+
+
+// @Summary {{.Name.Class}}
+// @Schemes
+// @Description {{.Name.Class}}
+// @Tags {{$.Name.Hyphen}}
+// @Accept json
+// @Produce json
+// @Param request {{if (ne .Method "GET")}} query {{else}} body {{end}} {{.Name.Class }}Request false "{{.Name.Class }}Request"
+// @Success 200 {object} {{.Name.Class}}Response
+// @Router /api/{{$.Name.Hyphen}} [{{.Method}}]
 {{ .FunCode }}
 
     {{ end }}
