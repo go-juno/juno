@@ -5,7 +5,6 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"log"
 	"sort"
 	"strings"
 	"text/template"
@@ -53,7 +52,6 @@ func parseEndpoint(path string, mod string) (endpointFunc *EndpointFunc, err err
 						for _, comment := range genDecl.Doc.List {
 							if strings.HasPrefix(comment.Text, "// @Router") {
 								routerSplit := strings.Split(comment.Text, " ")
-								log.Println("routerSplit", routerSplit)
 								if len(routerSplit) >= 4 {
 									fun.Path = routerSplit[2]
 									fun.Method = strings.ReplaceAll(strings.ReplaceAll(routerSplit[3], "[", ""), "]", "")

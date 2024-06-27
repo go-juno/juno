@@ -99,6 +99,6 @@ func (s *{{.Camel}}Service) Delete{{.Class}}(ctx context.Context, id uint) (err 
 	return
 }
 
-func New{{.Class}}Service(db *gorm.DB) {{.Class}}Service {
-	return &{{.Camel}}Service{db: db}
+func New{{.Class}}Service() {{.Class}}Service {
+	return &{{.Camel}}Service{}
 }
