@@ -70,7 +70,7 @@ func parseEndpoint(path string, mod string) (endpointFunc *EndpointFunc, err err
 		}
 	}
 	sort.Slice(endpointFunc.Funcs, func(i, j int) bool {
-		return endpointFunc.Funcs[i].Path < endpointFunc.Funcs[j].Path
+		return endpointFunc.Funcs[i].Name < endpointFunc.Funcs[j].Name
 	})
 
 	return
