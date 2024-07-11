@@ -7,7 +7,6 @@ import (
 	"{{.Mod}}/internal/constant"
 	"{{.Mod}}/internal/endpoint"
 	"{{.Mod}}/pkg/res"
-	_ "ep-service/docs"
 	
 	"github.com/gin-gonic/gin"
 )
