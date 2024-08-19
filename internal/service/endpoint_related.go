@@ -49,7 +49,7 @@ func GeneratorEndpoint(mod, name string) (err error) {
 	return
 }
 
-func WireEndpoint(mod, name string) (err error) {
+func WireEndpoint(mod string) (err error) {
 	g, err := generator.NewGenerator("wire", constant.EndpointDirPath, mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)

@@ -17,7 +17,19 @@ func CreateHttpEndpoint(request *CreateHttpRequest) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
+	// 更新servcie wire
+	err = service.WireService(mod)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
 
+	// 更新endpoint wire
+	err = service.WireEndpoint(mod)
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
 	// 创建handle
 	err = service.GenerateHandle(mod)
 	if err != nil {
@@ -34,6 +46,12 @@ func CreateHttpEndpoint(request *CreateHttpRequest) (err error) {
 
 	// import信息更新
 	err = command.GoimportsCode()
+	if err != nil {
+		err = xerrors.Errorf("%w", err)
+		return
+	}
+
+	err = command.RunWire()
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

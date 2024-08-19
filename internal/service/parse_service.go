@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"sort"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -31,6 +32,9 @@ func ParseServiceWire(path string) (w []*Service, err error) {
 				if ok {
 					if funcDecl.Name.Obj != nil {
 						if funcDecl.Name.Obj.Kind == ast.Fun {
+							if funcDecl.Type.Results == nil {
+								continue
+							}
 							service.NewFuncName = funcDecl.Name.Name
 							resultType, ok := funcDecl.Type.Results.List[0].Type.(*ast.Ident)
 							if ok {
@@ -51,6 +55,9 @@ func ParseServiceWire(path string) (w []*Service, err error) {
 		}
 
 	}
+	sort.Slice(w, func(i, j int) bool {
+		return w[i].ServiceName < w[j].ServiceName
+	})
 	return
 
 }

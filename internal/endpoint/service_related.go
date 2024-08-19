@@ -18,21 +18,24 @@ func CreateServiceEndpoint(request *CreateServiceRequest) (err error) {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
-	// 先创建内容
-	err = service.GeneratorService(mod, request.Name)
-	if err != nil {
-		err = xerrors.Errorf("%w", err)
-		return
+
+	if request.Name != "" {
+		// 先创建内容
+		err = service.GeneratorService(mod, request.Name)
+		if err != nil {
+			err = xerrors.Errorf("%w", err)
+			return
+		}
 	}
 	// 更新servcie wire
-	err = service.WireService(mod, request.Name)
+	err = service.WireService(mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
 	}
 
 	// 更新endpoint wire
-	err = service.WireEndpoint(mod, request.Name)
+	err = service.WireEndpoint(mod)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

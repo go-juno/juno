@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/go-juno/juno/internal/endpoint"
@@ -14,10 +13,6 @@ type CreateServiceCommand struct {
 
 func (t *CreateServiceCommand) Main() {
 	name := flag.Arguments().First().String()
-	if name == "" {
-		fmt.Println("service name required")
-		return
-	}
 	req := &endpoint.CreateServiceRequest{
 		Name: name,
 	}
