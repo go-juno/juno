@@ -13,9 +13,9 @@ import (
 type {{.Class}}Service interface {
 	Get{{.Class}}List(ctx context.Context, pageIndex int, pageSize int) (list []*entity.{{.Class}}, total int64, err error)
 	Get{{.Class}}All(ctx context.Context) (list []*entity.{{.Class}}, err error)
-	Get{{.Class}}Detail(ctx context.Context, id uint) ({{.Camel}} *entity.{{.Class}}, err error)
-	Create{{.Class}}(ctx context.Context, {{.Camel}} *entity.{{.Class}}) (err error)
-	Update{{.Class}}(ctx context.Context, {{.Camel}} *entity.{{.Class}}) (err error)
+	Get{{.Class}}Detail(ctx context.Context, id uint) (detail *entity.{{.Class}}, err error)
+	Create{{.Class}}(ctx context.Context, detail *entity.{{.Class}}) (err error)
+	Update{{.Class}}(ctx context.Context, detail *entity.{{.Class}}) (err error)
 	BatchInsert{{.Class}}(ctx context.Context, list []*entity.{{.Class}}) (err error)
 	Delete{{.Class}}(ctx context.Context, id uint) (err error)
 }
@@ -50,8 +50,8 @@ func (s *{{.Camel}}Service) Get{{.Class}}All(ctx context.Context) (list []*entit
 	return
 }
 
-func (s *{{.Camel}}Service) Get{{.Class}}Detail(ctx context.Context, id uint) ({{.Camel}} *entity.{{.Class}}, err error) {
-	err = s.db.WithContext(ctx).Model(&entity.{{.Class}}{}).Where("id = ?", id).Find(&{{.Camel}}).Limit(1).Error
+func (s *{{.Camel}}Service) Get{{.Class}}Detail(ctx context.Context, id uint) (detail *entity.{{.Class}}, err error) {
+	err = s.db.WithContext(ctx).Model(&entity.{{.Class}}{}).Where("id = ?", id).Find(&detail).Limit(1).Error
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -59,10 +59,10 @@ func (s *{{.Camel}}Service) Get{{.Class}}Detail(ctx context.Context, id uint) ({
 	return
 }
 
-func (s *{{.Camel}}Service) Create{{.Class}}(ctx context.Context, {{.Camel}} *entity.{{.Class}}) (err error) {
+func (s *{{.Camel}}Service) Create{{.Class}}(ctx context.Context, detail *entity.{{.Class}}) (err error) {
 	err = s.db.WithContext(ctx).Clauses(clause.OnConflict{
 		UpdateAll: true,
-	}).Create({{.Camel}}).Error
+	}).Create(detail).Error
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
@@ -70,8 +70,8 @@ func (s *{{.Camel}}Service) Create{{.Class}}(ctx context.Context, {{.Camel}} *en
 	return
 }
 
-func (s *{{.Camel}}Service) Update{{.Class}}(ctx context.Context, {{.Camel}} *entity.{{.Class}}) (err error) {
-	err = s.db.WithContext(ctx).Model(&entity.{{.Class}}{}).Where("id = ?", {{.Camel}}.Id).Updates({{.Camel}}).Error
+func (s *{{.Camel}}Service) Update{{.Class}}(ctx context.Context, detail *entity.{{.Class}}) (err error) {
+	err = s.db.WithContext(ctx).Model(&entity.{{.Class}}{}).Where("id = ?", detail.Id).Updates(detail).Error
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return
