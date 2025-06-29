@@ -2,8 +2,8 @@ package endpoint
 
 import (
 	"github.com/go-juno/juno/internal/service"
-	"github.com/go-juno/juno/pkg/command"
-	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/internal/util/command"
+	"github.com/go-juno/juno/internal/util/util"
 	"golang.org/x/xerrors"
 )
 

@@ -1,6 +1,6 @@
-module {mod}
+module {{mod}}
 
-go 1.17
+go 1.24
 
 require (
 	github.com/gin-gonic/gin v1.7.2

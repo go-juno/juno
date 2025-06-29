@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/internal/util/util"
 	"golang.org/x/xerrors"
 )
 

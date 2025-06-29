@@ -6,8 +6,8 @@ import (
 	"text/template"
 
 	"github.com/go-juno/juno/internal/constant"
-	"github.com/go-juno/juno/pkg/generator"
-	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/internal/util/generator"
+	"github.com/go-juno/juno/internal/util/util"
 	"github.com/go-juno/juno/static"
 	"golang.org/x/xerrors"
 )
@@ -66,7 +66,7 @@ func WireEndpoint(mod string) (err error) {
 		ServiceList: w,
 	}
 
-	tpl, err := template.New("s").Parse(static.EndpointWire)
+	tpl, err := template.New("s").Parse(static.EndpointWireTpl)
 	if err != nil {
 		err = xerrors.Errorf("%w", err)
 		return

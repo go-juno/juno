@@ -1,6 +1,11 @@
 package main
 
-import "github.com/go-juno/juno/cmd"
+import (
+	"fmt"
+	"os"
+
+	"{{\ .ModName }}"
+)
 
 func main() {
 	cmd.Execute()

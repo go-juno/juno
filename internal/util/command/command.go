@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-juno/juno/internal/constant"
-	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/internal/util/util"
 	"golang.org/x/xerrors"
 )
 

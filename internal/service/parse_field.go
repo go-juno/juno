@@ -7,7 +7,7 @@ import (
 	"go/token"
 	"path/filepath"
 
-	"github.com/go-juno/juno/pkg/util"
+	"github.com/go-juno/juno/internal/util/util"
 	"golang.org/x/tools/go/packages"
 	"golang.org/x/xerrors"
 )

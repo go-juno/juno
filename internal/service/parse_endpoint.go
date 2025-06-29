@@ -10,7 +10,7 @@ import (
 	"text/template"
 
 	"github.com/go-juno/juno/internal/constant"
-	"github.com/go-juno/juno/pkg/generator"
+	"github.com/go-juno/juno/internal/util/generator"
 	"github.com/go-juno/juno/static"
 	"golang.org/x/xerrors"
 )
