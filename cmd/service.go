@@ -30,6 +30,6 @@ var serviceCmd = &cobra.Command{
 }
 
 func init() {
-	serviceCmd.Flags().String("kind", "", "Specify the kind of service to create (e.g., mongo-crud)")
+	serviceCmd.Flags().String("kind", "", "Specify the kind of service to create (e.g., mongo)")
 	rootCmd.AddCommand(serviceCmd)
 }

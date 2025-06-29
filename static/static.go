@@ -28,8 +28,8 @@ var HandleTpl string
 //go:embed tpl/mongo_model.tpl
 var MongoModelTpl string
 
-//go:embed tpl/mongo_crud_service.tpl
-var MongoCRUDServiceTpl string
+//go:embed tpl/mongo_service.tpl
+var MongoServiceTpl string
 
 //go:embed tpl/main.tpl
 var MainTpl string
